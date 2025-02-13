@@ -1,0 +1,119 @@
+[
+  {
+    "category": "Áo",
+    "desc": "Áo sơ mi trắng cổ điển, phù hợp cho nhiều dịp từ công sở đến dạo phố.",
+    "pid": "ao-so-mi-trang",
+    "img": "/images/products/ao-so-mi-trang.png",
+    "inStock": "true",
+    "price": "25.99",
+    "size": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "title": "Áo Sơ Mi Trắng"
+  },
+  {
+    "category": "Quần",
+    "desc": "Quần jean xanh cổ điển, phong cách trẻ trung, dễ phối đồ.",
+    "pid": "quan-jean-xanh",
+    "img": "/images/products/quan-jean-xanh.png",
+    "inStock": "true",
+    "price": "35.50",
+    "size": [
+      "28",
+      "30",
+      "32",
+      "34"
+    ],
+    "title": "Quần Jean Xanh"
+  },
+  {
+    "category": "Váy",
+    "desc": "Váy hoa mùa hè nhẹ nhàng, thích hợp cho các buổi dạo phố hay hẹn hò.",
+    "pid": "vay-hoa-mua-he",
+    "img": "/images/products/vay-hoa-mua-he.png",
+    "inStock": "true",
+    "price": "40.75",
+    "size": [
+      "S",
+      "M",
+      "L"
+    ],
+    "title": "Váy Hoa Mùa Hè"
+  },
+  {
+    "category": "Áo",
+    "desc": "Áo thun cotton đơn giản, thoải mái, thích hợp mặc hàng ngày.",
+    "pid": "ao-thun-cotton",
+    "img": "/images/products/ao-thun-cotton.png",
+    "inStock": "true",
+    "price": "15.99",
+    "size": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "title": "Áo Thun Cotton"
+  },
+  {
+    "category": "Áo khoác",
+    "desc": "Áo khoác da phong cách, mang đến vẻ ngoài cá tính và thời thượng.",
+    "pid": "ao-khoac-da",
+    "img": "/images/products/ao-khoac-da.png",
+    "inStock": "true",
+    "price": "65.00",
+    "size": [
+      "M",
+      "L",
+      "XL"
+    ],
+    "title": "Áo Khoác Da"
+  },
+  {
+    "category": "Quần",
+    "desc": "Quần kaki nam lịch lãm, phù hợp cho môi trường công sở và sự kiện trang trọng.",
+    "pid": "quan-kaki-nam",
+    "img": "/images/products/quan-kaki-nam.png",
+    "inStock": "true",
+    "price": "30.99",
+    "size": [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36"
+    ],
+    "title": "Quần Kaki Nam"
+  },
+  {
+    "category": "Giày",
+    "desc": "Giày sneaker trắng basic, phù hợp với mọi phong cách thời trang.",
+    "pid": "giay-sneaker-trang",
+    "img": "/images/products/giay-sneaker-trang.png",
+    "inStock": "true",
+    "price": "50.00",
+    "size": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42"
+    ],
+    "title": "Giày Sneaker Trắng"
+  },
+  {
+    "category": "Phụ kiện",
+    "desc": "Mũ len mùa đông giữ ấm, phong cách trẻ trung, dễ phối đồ.",
+    "pid": "mu-len-mua-dong",
+    "img": "/images/products/mu-len-mua-dong.png",
+    "inStock": "true",
+    "price": "12.99",
+    "size": [
+      "Free Size"
+    ],
+    "title": "Mũ Len Mùa Đông"
+  }
+]
