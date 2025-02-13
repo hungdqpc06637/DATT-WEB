@@ -169,7 +169,7 @@
   dependencies:
     "@vue/shared" "3.3.4"
 
-"@vue/runtime-core@3.3.4":
+"@vue/runtime-core@^3.0.0", "@vue/runtime-core@3.3.4":
   version "3.3.4"
   resolved "https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.3.4.tgz"
   integrity sha512-R+bqxMN6pWO7zGI4OMlmvePOdP2c93GsHFM/siJI7O2nxFRzj55pLwkpCedEY+bTMgp5miZ8CxfIZo3S+gFqvA==
@@ -400,6 +400,14 @@ eastasianwidth@^0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz"
   integrity sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==
+
+echarts@^5.5.1, echarts@^5.6.0:
+  version "5.6.0"
+  resolved "https://registry.npmjs.org/echarts/-/echarts-5.6.0.tgz"
+  integrity sha512-oTbVTsXfKuEhxftHqL5xprgLoc0k7uScAwtryCgWF6hPYFLRwOUHiFmHGCBKP5NPFNkDVopOieyUqYGH8Fa3kA==
+  dependencies:
+    tslib "2.3.0"
+    zrender "5.6.1"
 
 editorconfig@^1.0.4:
   version "1.0.4"
@@ -781,6 +789,11 @@ throttle-debounce@^5.0.0:
   resolved "https://registry.npmjs.org/throttle-debounce/-/throttle-debounce-5.0.2.tgz"
   integrity sha512-B71/4oyj61iNH0KeCamLuE2rmKuTO5byTOSVwECM5FA7TiAiAW+UqTKZ9ERueC4qvgSttUhdmq1mXC3kJqGX7A==
 
+tslib@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/tslib/-/tslib-2.3.0.tgz"
+  integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==
+
 vite@^4.0.0, vite@^4.3.9:
   version "4.3.9"
   resolved "https://registry.npmjs.org/vite/-/vite-4.3.9.tgz"
@@ -802,6 +815,18 @@ vue-component-type-helpers@^2.0.0:
   resolved "https://registry.npmjs.org/vue-component-type-helpers/-/vue-component-type-helpers-2.2.0.tgz"
   integrity sha512-cYrAnv2me7bPDcg9kIcGwjJiSB6Qyi08+jLDo9yuvoFQjzHiPTzML7RnkJB1+3P6KMsX/KbCD4QE3Tv/knEllw==
 
+vue-demi@^0.13.11:
+  version "0.13.11"
+  resolved "https://registry.npmjs.org/vue-demi/-/vue-demi-0.13.11.tgz"
+  integrity sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==
+
+vue-echarts@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.npmjs.org/vue-echarts/-/vue-echarts-7.0.3.tgz"
+  integrity sha512-/jSxNwOsw5+dYAUcwSfkLwKPuzTQ0Cepz1LxCOpj2QcHrrmUa/Ql0eQqMmc1rTPQVrh2JQ29n2dhq75ZcHvRDw==
+  dependencies:
+    vue-demi "^0.13.11"
+
 vue-router@4:
   version "4.5.0"
   resolved "https://registry.npmjs.org/vue-router/-/vue-router-4.5.0.tgz"
@@ -816,7 +841,7 @@ vue-types@^3.0.0:
   dependencies:
     is-plain-object "3.0.1"
 
-vue@^3.0.0, "vue@^3.0.0-0 || ^2.7.0", vue@^3.2.0, vue@^3.2.25, vue@^3.3.4, vue@>=3.0.3, vue@>=3.2.0, vue@3.3.4:
+"vue@^2.7.0 || ^3.1.1", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", "vue@^3.0.0-0 || ^2.7.0", vue@^3.2.0, vue@^3.2.25, vue@^3.3.4, vue@>=3.0.3, vue@>=3.2.0, vue@3.3.4:
   version "3.3.4"
   resolved "https://registry.npmjs.org/vue/-/vue-3.3.4.tgz"
   integrity sha512-VTyEYn3yvIeY1Py0WaYGZsXnz3y5UnGi62GjVEqvEGPl6nxbOrCXbVOTQWBEJUqAyTUk2uJ5JLVnYJ6ZzGbrSw==
@@ -881,3 +906,10 @@ wrap-ansi@^8.1.0:
     ansi-styles "^6.1.0"
     string-width "^5.0.1"
     strip-ansi "^7.0.1"
+
+zrender@5.6.1:
+  version "5.6.1"
+  resolved "https://registry.npmjs.org/zrender/-/zrender-5.6.1.tgz"
+  integrity sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==
+  dependencies:
+    tslib "2.3.0"

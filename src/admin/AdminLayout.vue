@@ -32,7 +32,7 @@ import AdminNavbar from "@/admin/component/AdminNavbar.vue";
 }
 
 .sidebar {
-    width: 250px;
+    width: 300px;
     background-color: #2d3748;
     color: white;
     padding: 16px;
