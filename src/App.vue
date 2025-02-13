@@ -1,15 +1,24 @@
 <script setup>
+import { useRoute } from 'vue-router'; // Import useRoute từ Vue Router
 import NavBar from './components/NavBar.vue';
 import Footer from './components/Footer.vue';
 import Notifications from './components/Notifications.vue';
+
+const route = useRoute(); // Khai báo route
 </script>
 
 <template>
-  <NavBar />
-  <router-view />
-  <Footer />
-  <Notifications />
+  <div>
+    <!-- Chỉ hiển thị NavBar và Footer khi không phải trang admin -->
+    <NavBar v-if="!route.path.startsWith('/admin')" />
+    
+    <router-view />
+    
+    <Footer v-if="!route.path.startsWith('/admin')" />
+    <Notifications />
+  </div>
 </template>
+
 
 <script>
 import { userRequest } from './requestMethod.js';

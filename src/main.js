@@ -1,24 +1,19 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
-// import { createPinia } from 'pinia';
+import 'bootstrap/dist/css/bootstrap.min.css' // Bootstrap CSS
+import 'bootstrap-icons/font/bootstrap-icons.css' // Bootstrap Icons
+import "ant-design-vue/dist/reset.css"; // Ant Design CSS
 
-import 'bootstrap'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap' // Bootstrap JS
 
 import App from './App.vue'
-
 import useCustomeDirective from './directives'
-
 import store from './vuex'
 import router from './router/index.js'
-
-// const pinia = createPinia()
+import Antd from "ant-design-vue";
 
 const app = createApp(App)
-// app.use(pinia)
 app.use(store)
+app.use(Antd)
 app.use(router)
 useCustomeDirective(app);
 app.mount('#app')

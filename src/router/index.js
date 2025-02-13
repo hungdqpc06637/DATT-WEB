@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-
+import adminRoutes from '../admin/adminRoutes';
 import * as page from '../pages'
 
 const routes = [
@@ -12,6 +12,7 @@ const routes = [
   { path: '/profile', component: page.Profile },
   { path: '/checkout', component: page.Checkout },
   { path: '/receipt/:id', component: page.Receipt },
+  ...adminRoutes,
 ]
 
 export default createRouter({
