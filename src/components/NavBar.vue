@@ -12,7 +12,8 @@
   </header>
   <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top border">
     <div class="container">
-      <a class="navbar-brand font-bold" href="#">FASHION SHOP</a>
+      <a class="navbar-brand font-bold" href="/">FASHION SHOP</a>
+      <a class="navbar-brand font-bold" href="/products">SẢN PHẨM</a>
       <div class="navbar-nav ms-auto">
         <router-link to="/login" class="nav-link" v-if="!user">
           <button class="btn btn-outline-dark">

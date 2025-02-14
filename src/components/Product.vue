@@ -1,11 +1,14 @@
 <template>
 	<div class="product-container">
-		<div class="product-circle"/>
-		<img class="product-image" :src="product.img" :alt="product.title"/>
+		<div class="product-circle" />
+		<img class="product-image" :src="`/images/${product.image_urls?.[0] || 'default-image.jpg'}`"
+			:alt="product.name || 'Sản phẩm không có tên'" />
+
+
 		<div class="product-info">
-			<label class="product-title"> {{ product.title }} </label>
+			<label class="product-title"> {{ product.name }} </label>
 			<div class="product-icons">
-				<div class="product-icon" v-add-to-cart="{ $store, item: {...product, quantity: 1} }">
+				<div class="product-icon" v-add-to-cart="{ $store, item: { ...product, quantity: 1 } }">
 					<i class="bi bi-cart-plus-fill"></i>
 				</div>
 				<router-link :to="'/product/' + product.pid" class="text-dark text-decoration-none">
@@ -47,7 +50,7 @@ export default {
 }
 
 .product-container:hover .product-info {
-  opacity: 1;
+	opacity: 1;
 }
 
 .product-circle {
@@ -71,7 +74,7 @@ export default {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-color: rgba(0,0,0,0.2);
+	background-color: rgba(0, 0, 0, 0.2);
 	z-index: 3;
 	display: flex;
 	flex-direction: column;
@@ -106,11 +109,11 @@ export default {
 	align-items: center;
 	justify-content: center;
 	margin: 10px;
-	transform:all 0.5s ease;
+	transform: all 0.5s ease;
 }
 
 .product-icon:hover {
-  background-color: #f7d8a7;
-  transform: scale(1.1);
+	background-color: #f7d8a7;
+	transform: scale(1.1);
 }
 </style>
