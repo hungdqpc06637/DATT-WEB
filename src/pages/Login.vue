@@ -8,23 +8,23 @@
           </ul>
         </div>
         <div class="card">
-          <h5 class="card-header">Login</h5>
+          <h5 class="card-header">Đăng nhập</h5>
           <div class="card-body">
             <form>
               <div class="mb-3">
-                <label for="usernameInput" class="form-label">Username</label>
-                <input type="text" class="form-control" name="usernameInput" id="usernameInput" v-model="usernameInput" placeholder="Enter your username">
+                <label for="usernameInput" class="form-label">Tên đăng nhập</label>
+                <input type="text" class="form-control" name="usernameInput" id="usernameInput" v-model="usernameInput" placeholder="Nhập tên đăng nhập của bạn">
               </div>
               <div class="mb-3">
-                <label for="passwordInput" class="form-label">Password</label>
-                <input type="password" class="form-control" name="passwordInput" id="passwordInput" v-model="passwordInput" placeholder="Enter your password">
+                <label for="passwordInput" class="form-label">Mật khẩu</label>
+                <input type="password" class="form-control" name="passwordInput" id="passwordInput" v-model="passwordInput" placeholder="Nhập mật khẩu của bạn">
               </div>
-              <button type="button" class="btn btn-outline-dark float-end" @click="checkForm" :disabled="isLoading">Login</button>
+              <button type="button" class="btn btn-outline-dark float-end" @click="checkForm" :disabled="isLoading">Đăng nhập</button>
             </form>
           </div>
           <div class="card-footer text-center d-flex justify-content-between">
-            <small><router-link to="/register">Does not have an account?</router-link></small>
-            <small><a href="#">Forgot password?</a></small>
+            <small><router-link to="/register">Chưa có tài khoản?</router-link></small>
+            <small><a href="#">Quên mật khẩu?</a></small>
           </div>
         </div>
       </div>
@@ -52,13 +52,13 @@ export default {
       // Validate username
       if (!this.usernameInput.trim()) {
         result = false;
-        this.errors.push("Please enter a username.");
+        this.errors.push("Vui lòng nhập tên đăng nhập.");
       }
 
       // Validate password
       if (!this.passwordInput.trim()) {
         result = false;
-        this.errors.push("Please enter a password.");
+        this.errors.push("Vui lòng nhập mật khẩu.");
       }
 
       if (!result) {
@@ -78,13 +78,13 @@ export default {
       publicRequest.post('/auth/login', data)
       .then(response => {
         this.$store.dispatch('setUser', response.data);
-        this.$store.dispatch('addNotification', "You have logged in.");
+        this.$store.dispatch('addNotification', "Bạn đã đăng nhập thành công.");
         this.$router.push('/profile');
       })
       .catch(error => {
         console.log(error);
         this.isLoading = false;
-        this.$store.dispatch('addNotification', "Login failed.");
+        this.$store.dispatch('addNotification', "Đăng nhập thất bại.");
       })
     }
   }

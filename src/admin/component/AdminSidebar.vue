@@ -1,6 +1,8 @@
 <template>
     <div class="sidebar">
-        <h2 class="sidebar-title">📌 QUẢN TRỊ VIÊN 📌</h2>
+        <h2 class="sidebar-title" @click="$router.push('/admin')" style="cursor: pointer;">
+            📌 QUẢN TRỊ VIÊN 📌
+        </h2>
         <ul class="sidebar-list">
             <li v-for="item in menuItems" :key="item.path">
                 <router-link :to="item.path" class="sidebar-item" :class="{ 'active': isActive(item.path) }">
@@ -30,7 +32,8 @@ const isActive = (path) => route.path === path;
 <style scoped>
 /* Sidebar */
 .sidebar {
-    width: 250px; /* Đảm bảo kích thước cố định */
+    width: 250px;
+    /* Đảm bảo kích thước cố định */
     padding: 10px 15px;
     border-radius: 12px;
 }
@@ -39,7 +42,8 @@ const isActive = (path) => route.path === path;
     width: 250px;
     background-color: #2d3748;
     color: white;
-    padding: 0; /* Xóa padding */
+    padding: 0;
+    /* Xóa padding */
     flex-shrink: 0;
 }
 

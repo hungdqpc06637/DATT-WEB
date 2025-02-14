@@ -15,8 +15,8 @@
                 </template>
                 <template v-if="column.dataIndex === 'actions'">
                     <a-space>
-                        <a-button type="primary" size="large" @click="editProduct(record)">Sửa</a-button>
-                        <a-button type="primary" danger size="large" @click="deleteProduct(record.id)">Xóa</a-button>
+                        <a-button  class="btn-update" type="primary" size="large" @click="editProduct(record)">Sửa</a-button>
+                        <a-button class="btn-delete" type="primary" danger size="large" @click="deleteProduct(record.id)">Xóa</a-button>
                     </a-space>
                 </template>
             </template>
@@ -80,5 +80,34 @@ const deleteProduct = (id) => {
     text-align: center;
     font-size: 14px;
     padding: 10px;
+}
+
+.btn-update {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: white;
+  font-weight: bold;
+  border: none;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-update:hover {
+  background: linear-gradient(135deg, #4338ca, #4f46e5);
+  transform: scale(1.05);
+  box-shadow: 0px 4px 10px rgba(79, 70, 229, 0.4);
+}
+
+/* Nút Hủy */
+.btn-delete {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  font-weight: bold;
+  border: none;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-delete:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: scale(1.05);
+  box-shadow: 0px 4px 10px rgba(239, 68, 68, 0.4);
 }
 </style>

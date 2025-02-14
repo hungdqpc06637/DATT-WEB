@@ -1,6 +1,10 @@
 <template>
-    <nav
-        class="navbar navbar-expand text-white shadow-sm px-4 d-flex justify-content-between align-items-center w-100">
+    <nav class="navbar navbar-expand text-white shadow-sm px-4 d-flex justify-content-between align-items-center w-100">
+        <!-- Nút Trang chủ nằm bên trái -->
+        <button class="btn btn-outline-light" @click="goHome">
+            <i class="bi bi-house-door me-2"></i> Trang chủ
+        </button>
+
         <!-- Nút Admin nằm sát góc phải -->
         <div class="dropdown ms-auto">
             <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button"
@@ -24,6 +28,10 @@ import { useStore } from 'vuex';
 
 const router = useRouter();
 const store = useStore();
+
+const goHome = () => {
+    router.push('/');
+};
 
 const logout = () => {
     store.dispatch('logout');
