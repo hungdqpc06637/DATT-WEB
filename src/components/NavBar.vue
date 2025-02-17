@@ -3,68 +3,246 @@
     <div class="announcement text-white">
       <div class="container">
         <div class="row">
-          <div class="text-center p-1 ">
+          <div class="text-center p-1">
             <p class="mb-0">Miễn phí vận chuyển cho đơn hàng trên 250.000đ</p>
           </div>
         </div>
       </div>
     </div>
   </header>
+
   <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top border">
     <div class="container">
-      <a class="navbar-brand font-bold" href="/">FASHION SHOP</a>
-      <a class="navbar-brand font-bold" href="/products">SẢN PHẨM</a>
-      <div class="navbar-nav ms-auto">
-        <router-link to="/login" class="nav-link" v-if="!user">
-          <button class="btn btn-outline-dark">
-            <i class="bi bi-door-open-fill"></i> Đăng nhập
-          </button>
-        </router-link>
+      <!-- Logo -->
+      <a class="navbar-brand" href="/">
+        <img src="/images/logohl.png" alt="Fashion Shop Logo" width="150" height="auto">
+        FASHION SHOP
+      </a>
 
-        <li class="nav-item dropdown" v-if="user">
-          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-            <img :src="'https://placehold.co/100x100'" width="40" height="40" class="rounded-circle">
-            <span class="mx-2">{{ user.username }}</span> <!-- ✅ Hiển thị tên người dùng -->
-          </a>
-          <div class="dropdown-menu">
-            <router-link to="/profile" class="dropdown-item"><i class="bi bi-person-circle mx-1"></i>Trang cá
-              nhân</router-link>
-            <button class="dropdown-item text-danger" @click="logout"><i class="bi bi-door-closed-fill mx-1"></i>Đăng
-              xuất</button>
-          </div>
-        </li>
+      <!-- Nút toggler trên mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <router-link to="/cart" class="nav-link">
-          <button class="btn btn-outline-dark">
-            <i class="bi bi-cart-fill me-1"></i>
-            <span class="badge bg-dark text-white ms-1 rounded-pill">3</span>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <!-- Dropdown Sản phẩm -->
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link  nav-underline" href="#" id="aboutDropdown" role="button"
+              data-bs-toggle="dropdown" @click.prevent="goToProducts">
+              SẢN PHẨM
+            </a>
+
+            <ul class="dropdown-menu">
+              <li>
+                <router-link class="dropdown-item" to="/products">
+                  <a>Áo</a>
+                </router-link>
+
+              </li>
+              <li>
+                <router-link class="dropdown-item" to="/products">
+                  <a>Quần</a>
+                </router-link>
+              </li>
+              <li>
+                <router-link class="dropdown-item" to="/products">
+                  <a>Giày Dép</a>
+                </router-link>
+              </li>
+              <li>
+                <router-link class="dropdown-item" to="/products">
+                  <a>Phụ Kiện</a>
+                </router-link>
+              </li>
+            </ul>
+          </li>
+
+
+          <!-- Dropdown Giới thiệu -->
+          <li class="nav-item dropdown">
+            <a class="nav-link  nav-underline" href="#" id="aboutDropdown" role="button"
+              data-bs-toggle="dropdown">
+              GIỚI THIỆU
+            </a>
+            <ul class="dropdown-menu">
+              <li><router-link class="dropdown-item" to="#">Về chúng tôi</router-link></li>
+              <li><router-link class="dropdown-item" to="#">Liên hệ</router-link></li>
+            </ul>
+          </li>
+        </ul>
+
+        <!-- 🔎 Ô tìm kiếm -->
+        <form class="d-flex search-bar">
+          <input class="form-control me-2" type="search" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
+          <button class="btn btn-dark" type="submit">
+            <i class="bi bi-search"></i>
           </button>
-        </router-link>
+        </form>
+
+        <!-- 🔘 Nút đăng nhập / tài khoản -->
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item" v-if="!user">
+            <router-link to="/login" class="nav-link">
+              <button class="btn btn-outline-dark">
+                <i class="bi bi-door-open-fill"></i> Đăng nhập
+              </button>
+            </router-link>
+          </li>
+
+          <li class="nav-item dropdown" v-if="user">
+            <a class="nav-link " href="#" data-bs-toggle="dropdown">
+              <img :src="'https://placehold.co/40x40'" class="rounded-circle" width="40" height="40">
+              <span class="mx-2">{{ user.username }}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><router-link class="dropdown-item" to="/profile">
+                  <i class="bi bi-person-circle"></i> Trang cá nhân
+                </router-link></li>
+              <li>
+                <button class="dropdown-item text-danger" @click="logout">
+                  <i class="bi bi-door-closed-fill"></i> Đăng xuất
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- 🛒 Giỏ hàng -->
+          <li class="nav-item">
+            <router-link to="/cart" class="nav-link">
+              <button class="btn btn-outline-dark">
+                <i class="bi bi-cart-fill"></i>
+                <span class="badge bg-dark text-white ms-1 rounded-pill">3</span>
+              </button>
+            </router-link>
+          </li>
+        </ul>
       </div>
     </div>
   </nav>
-
 </template>
 
 <script>
 import { onMounted } from "vue";
 import { useAuth } from "../composables/useAuth"; // ✅ Import useAuth
+import { useRouter } from 'vue-router';
 
 export default {
   setup() {
     const { user, loadUser, logout } = useAuth();
+    const router = useRouter();  // ✅ Khai báo useRouter để điều hướng
+    onMounted(loadUser);
 
-    onMounted(loadUser); // ✅ Load user khi component được mount
+    // ✅ Sử dụng router.push() đúng cách trong setup
+    const goToProducts = () => {
+      router.push('/products');
+    };
 
-    return { user, logout };
-  },
+    return { user, logout, goToProducts };
+  }
 };
 </script>
 
-
-
 <style scoped>
 .announcement {
-  background-color: #000000;
+  background-color: #000;
+  text-align: center;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.navbar-nav {
+  list-style: none !important;
+  padding-left: 0;
+}
+
+.navbar-nav .nav-item {
+  padding-left: 15px;
+}
+
+.navbar-nav .nav-link {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dropdown-menu {
+  list-style: none !important;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.navbar-nav .btn-outline-dark {
+  font-size: 14px;
+  padding: 5px 12px;
+  border-radius: 8px;
+}
+
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0;
+  height: 1px;
+  background-color: black;
+  transition: width 0.3s ease-in-out;
+}
+
+.nav-underline:hover::after {
+  width: 100%;
+}
+
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1050;
+}
+
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.navbar-nav {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+
+.search-bar {
+  max-width: 300px;
+  margin-left: 15px;
+}
+
+.search-bar input {
+  border-radius: 8px;
+}
+
+.search-bar button {
+  border-radius: 8px;
+}
+
+.navbar {
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar:hover {
+  background-color: #f8f9fa;
+}
+
+.navbar-brand img {
+  width: 50px;
+  height: auto;
+}
+
+.navbar-brand {
+  letter-spacing: 4px;
 }
 </style>

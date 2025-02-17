@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import adminRoutes from '../admin/adminRoutes';
 import * as page from '../pages'
+import adminRoutes from '../admin/adminRoutes'
 
 const routes = [
   { path: '/', component: page.Home },
@@ -15,11 +15,13 @@ const routes = [
   ...adminRoutes,
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    return { top: 0 }
+    console.log('Navigating to:', to.path);
+    return { top: 0 };
   },
 })
 
+export default router;

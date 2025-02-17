@@ -11,14 +11,11 @@
 				<div class="product-icon" v-add-to-cart="{ $store, item: { ...product, quantity: 1 } }">
 					<i class="bi bi-cart-plus-fill"></i>
 				</div>
-				<router-link :to="'/product/' + product.pid" class="text-dark text-decoration-none">
+				<router-link :to="'/product/' + product.id" class="text-dark text-decoration-none">
 					<div class="product-icon">
-						<i class="bi bi-search"></i>
+						<i class="bi bi-eye"></i>
 					</div>
 				</router-link>
-				<div class="product-icon">
-					<i class="bi bi-heart-fill"></i>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -44,9 +41,7 @@ export default {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: #f7f4ee;
 	position: relative;
-	border-radius: 10px;
 }
 
 .product-container:hover .product-info {
@@ -54,18 +49,23 @@ export default {
 }
 
 .product-circle {
-	width: 100px;
-	height: 100px;
+	width: 80px;
+	height: 80px;
 	border-radius: 50%;
 	background-color: white;
 	position: absolute;
+	z-index: 1;
 }
 
+
 .product-image {
-	height: 75%;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 	border-radius: 10%;
 	z-index: 2;
 }
+
 
 .product-info {
 	opacity: 0;
@@ -74,7 +74,6 @@ export default {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-color: rgba(0, 0, 0, 0.2);
 	z-index: 3;
 	display: flex;
 	flex-direction: column;

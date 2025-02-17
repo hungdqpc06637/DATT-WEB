@@ -2,7 +2,7 @@
   <div :id="String(toastId)" class="toast fade show custom-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
     <div class="toast-header">
       <i class="bi bi-bag-check me-2 text-gold"></i>
-      <strong class="me-auto text-uppercase">Fashion Alert</strong>
+      <strong class="me-auto text-uppercase">Thông Báo</strong>
       <small class="text-muted">Just now</small>
       <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>

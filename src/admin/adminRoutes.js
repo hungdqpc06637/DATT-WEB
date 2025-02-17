@@ -1,21 +1,17 @@
 import AdminLayout from "@/admin/AdminLayout.vue";
-import Dashboard from "@/admin/views/Dashboard.vue";
-import Products from "@/admin/views/Products.vue";
-import Orders from "@/admin/views/Orders.vue";
-import Users from "@/admin/views/Users.vue";
-import AdminWelcome from "@/admin/views/AdminWelcome.vue"; 
 
 export default [
   {
     path: "/admin",
-    component: AdminLayout,  // Layout riêng cho admin
+    component: AdminLayout,
     children: [
-      { path: "", component: AdminWelcome  },
-      { path: "dashboard", component: Dashboard },
-      { path: "products", component: Products },
-      { path: "orders", component: Orders },
-      { path: "users", component: Users }
+      { path: "", component: () => import("@/admin/views/AdminWelcome.vue") },
+      { path: "dashboard", component: () => import("@/admin/views/Dashboard.vue") },
+      { path: "products", component: () => import("@/admin/views/Products.vue") },
+      { path: "orders", component: () => import("@/admin/views/Orders.vue") },
+      { path: "users", component: () => import("@/admin/views/Users.vue") }
     ],
     meta: { requiresAdmin: true }
   }
 ];
+

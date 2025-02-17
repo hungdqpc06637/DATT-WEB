@@ -4,6 +4,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css' // Bootstrap Icons
 import "ant-design-vue/dist/reset.css"; // Ant Design CSS
 
 import 'bootstrap' // Bootstrap JS
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Thêm Popper.js vào
 
 import App from './App.vue'
 import useCustomeDirective from './directives'

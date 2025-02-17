@@ -5,36 +5,40 @@
             <i class="bi bi-house-door me-2"></i> Trang chủ
         </button>
 
-        <!-- Nút Admin nằm sát góc phải -->
-        <div class="dropdown ms-auto">
-            <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button"
-                data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle me-2"></i> Admin
+        <!-- Hiển thị thông tin người dùng -->
+        <div class="d-flex align-items-center">
+            <span class="me-3">Hello, {{ username }}</span> <!-- Hiển thị tên người dùng -->
+
+            <!-- Nút Đăng xuất -->
+            <button class="btn btn-outline-light d-flex align-items-center" @click="logout">
+                <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                    <button class="dropdown-item" @click="logout">
-                        <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
-                    </button>
-                </li>
-            </ul>
         </div>
     </nav>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 
 const router = useRouter();
-const store = useStore();
+
+// Lấy thông tin người dùng từ localStorage
+const user = JSON.parse(localStorage.getItem('user'));
+
+// Kiểm tra và lấy tên người dùng
+const username = user ? user.username : 'Guest';
 
 const goHome = () => {
     router.push('/');
 };
 
 const logout = () => {
-    store.dispatch('logout');
+    // Xoá thông tin người dùng khỏi localStorage khi đăng xuất
+    localStorage.removeItem('user');
     router.push('/login');
 };
 </script>
+
+<style scoped>
+/* Đảm bảo không có xung đột với CSS dropdown */
+</style>
