@@ -9,7 +9,7 @@
         
         <div v-if="cart.length === 0" class="text-center mt-5">
           <p class="text-muted">🛒 Giỏ hàng của bạn đang trống.</p>
-          <router-link to="/shop">
+          <router-link to="/products ">
             <button class="btn btn-dark">Tiếp tục mua sắm</button>
           </router-link>
         </div>

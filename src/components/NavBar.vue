@@ -20,49 +20,28 @@
       </a>
 
       <!-- Nút toggler trên mobile -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <button class="navbar-toggler" type="button" @click="toggleNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
+      <div :class="['collapse', 'navbar-collapse', { show: isNavbarOpen }]" id="navbarNav">
         <!-- Dropdown Sản phẩm -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link  nav-underline" href="#" id="aboutDropdown" role="button"
-              data-bs-toggle="dropdown" @click.prevent="goToProducts">
+            <a class="nav-link nav-underline" href="#" data-bs-toggle="dropdown" @click.prevent="goToProducts">
               SẢN PHẨM
             </a>
-
             <ul class="dropdown-menu">
-              <li>
-                <router-link class="dropdown-item" to="/products">
-                  <a>Áo</a>
-                </router-link>
-
-              </li>
-              <li>
-                <router-link class="dropdown-item" to="/products">
-                  <a>Quần</a>
-                </router-link>
-              </li>
-              <li>
-                <router-link class="dropdown-item" to="/products">
-                  <a>Giày Dép</a>
-                </router-link>
-              </li>
-              <li>
-                <router-link class="dropdown-item" to="/products">
-                  <a>Phụ Kiện</a>
-                </router-link>
-              </li>
+              <li><router-link class="dropdown-item" to="/products">Áo</router-link></li>
+              <li><router-link class="dropdown-item" to="/products">Quần</router-link></li>
+              <li><router-link class="dropdown-item" to="/products">Giày Dép</router-link></li>
+              <li><router-link class="dropdown-item" to="/products">Phụ Kiện</router-link></li>
             </ul>
           </li>
 
-
           <!-- Dropdown Giới thiệu -->
           <li class="nav-item dropdown">
-            <a class="nav-link  nav-underline" href="#" id="aboutDropdown" role="button"
-              data-bs-toggle="dropdown">
+            <a class="nav-link nav-underline" href="#" data-bs-toggle="dropdown">
               GIỚI THIỆU
             </a>
             <ul class="dropdown-menu">
@@ -91,14 +70,12 @@
           </li>
 
           <li class="nav-item dropdown" v-if="user">
-            <a class="nav-link " href="#" data-bs-toggle="dropdown">
+            <a class="nav-link" href="#" data-bs-toggle="dropdown">
               <img :src="'https://placehold.co/40x40'" class="rounded-circle" width="40" height="40">
               <span class="mx-2">{{ user.username }}</span>
             </a>
             <ul class="dropdown-menu">
-              <li><router-link class="dropdown-item" to="/profile">
-                  <i class="bi bi-person-circle"></i> Trang cá nhân
-                </router-link></li>
+              <li><router-link class="dropdown-item" to="/profile"><i class="bi bi-person-circle"></i> Trang cá nhân</router-link></li>
               <li>
                 <button class="dropdown-item text-danger" @click="logout">
                   <i class="bi bi-door-closed-fill"></i> Đăng xuất
@@ -122,8 +99,9 @@
   </nav>
 </template>
 
+
 <script>
-import { onMounted } from "vue";
+import { onMounted ,ref } from "vue";
 import { useAuth } from "../composables/useAuth"; // ✅ Import useAuth
 import { useRouter } from 'vue-router';
 
@@ -131,14 +109,20 @@ export default {
   setup() {
     const { user, loadUser, logout } = useAuth();
     const router = useRouter();  // ✅ Khai báo useRouter để điều hướng
+    const isNavbarOpen = ref(false);
     onMounted(loadUser);
+
+     // ✅ Hàm toggle menu
+     const toggleNavbar = () => {
+      isNavbarOpen.value = !isNavbarOpen.value;
+    };
 
     // ✅ Sử dụng router.push() đúng cách trong setup
     const goToProducts = () => {
       router.push('/products');
     };
 
-    return { user, logout, goToProducts };
+    return { user, logout, goToProducts, toggleNavbar, isNavbarOpen };
   }
 };
 </script>
@@ -245,4 +229,15 @@ export default {
 .navbar-brand {
   letter-spacing: 4px;
 }
+
+/* Đảm bảo menu không bị chồng lên hoặc bị khóa khi toggle */
+.navbar-collapse {
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar-toggler {
+  z-index: 1051; /* Đảm bảo nút toggle nổi bật hơn các phần tử khác */
+}
+
+
 </style>

@@ -9,6 +9,7 @@
 				<p class="text-muted mb-5" v-if="product && !loading">
 					THỜI TRANG | {{ product.category?.toUpperCase() }} | {{ product.name?.toUpperCase() }}
 				</p>
+
 				<div class="row gx-4 gx-lg-5 align-items-center" v-if="product">
 					<div class="col-md-5 position-relative">
 						<!-- Hình ảnh lớn -->
@@ -34,7 +35,12 @@
 						<div class="fs-5 mb-5">
 							<span>{{ getCurrentPrice() }} VNĐ</span>
 						</div>
-						<p class="lead">{{ product.desc }}</p>
+
+						<!-- Mô tả sản phẩm -->
+						<p class="lead" :class="{ 'collapsed': !showMoreDescription }">{{ product.description }}</p>
+						<button class="btn btn-link" @click="toggleDescription">
+							{{ showMoreDescription ? 'Thu gọn' : 'Xem thêm' }}
+						</button>
 
 						<!-- Chọn kích cỡ -->
 						<div class="col-md-12 mb-3">
@@ -50,7 +56,7 @@
 						<!-- Chọn màu sắc -->
 						<div class="col-md-12 mb-3" v-if="currentSize">
 							<label class="mb-1">Chọn màu sắc:</label>
-							<div class="d-flex">
+							<div class="d-flex flex-wrap">
 								<button v-for="color in filteredColors" :key="color" :style="{ backgroundColor: color }"
 									class="color-filter" @click="toggleColor(color)"
 									:class="{ 'selected': currentColor === color }">
@@ -59,8 +65,7 @@
 						</div>
 
 						<!-- Chọn số lượng -->
-						<!-- Chọn số lượng -->
-						<div class="d-flex">
+						<div class="d-flex flex-wrap">
 							<div class="btn-group me-3">
 								<button type="button" class="btn btn-outline-dark" @click="decrease">-</button>
 								<button type="button" class="btn btn-outline-dark">{{ quantity }}</button>
@@ -107,12 +112,18 @@ const quantity = ref(1);  // Số lượng mặc định
 const sizes = ref([]);
 const colors = ref([]);
 const filteredColors = ref([]);
+const showMoreDescription = ref(false); // Trạng thái "Xem thêm"
 
 const route = useRoute();
 
 // Hàm lấy giá hiện tại (tùy theo biến `product`)
 const getCurrentPrice = () => {
 	return product.value?.variants?.find(variant => variant.size === currentSize.value && variant.color === currentColor.value)?.price || product.value.base_price;
+};
+
+// Hàm để toggle mô tả sản phẩm (Xem thêm / Thu gọn)
+const toggleDescription = () => {
+	showMoreDescription.value = !showMoreDescription.value;
 };
 
 // Hàm thay đổi hình ảnh khi người dùng chọn hình thu nhỏ
@@ -245,5 +256,14 @@ onMounted(() => {
 
 .color-filter.selected {
 	border: 2px solid black;
+}
+
+.lead.collapsed {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	/* Chỉ hiển thị 3 dòng */
+	-webkit-box-orient: vertical;
 }
 </style>
