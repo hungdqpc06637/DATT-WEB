@@ -1,26 +1,28 @@
 <template>
-  <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <!-- Render thông báo từ Vuex store -->
-    <Notification v-for="notification in notifications" :key="notification.id" :toastId="notification.id"
-      :desc="notification.desc" />
+  <div class="toast">
+    <div class="toast-body">
+      <!-- Kiểm tra nếu desc là đối tượng, lấy desc.desc, nếu là chuỗi, hiển thị trực tiếp -->
+      <span v-if="typeof desc === 'object'">{{ desc.desc }}</span>
+      <span v-else>{{ desc }}</span>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import Notification from '../components/Notification.vue';
-
 export default {
-  components: {
-    Notification
-  },
-  computed: {
-    ...mapState({
-      // Map `notifications.data` từ Vuex store
-      notifications: state => state.notifications.data
-    })
+  props: {
+    toastId: {
+      type: [String, Number],
+      required: true
+    },
+    desc: {
+      type: [String, Object], // Chấp nhận cả String hoặc Object
+      required: true
+    }
   }
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Style cho toast nếu cần */
+</style>

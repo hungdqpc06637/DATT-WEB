@@ -61,14 +61,13 @@
             </form>
           </div>
           <div class="tab-pane fade" id="order-history">
-            <History :userId="user._id" />
+            <History :userId="userId" />
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import { ref, onMounted } from "vue";
@@ -84,8 +83,16 @@ export default {
     const emailInput = ref("");
     const phoneInput = ref("");
     const shippingAddressInput = ref("");
+    const userId = ref(null);
 
     onMounted(() => {
+      // Lấy user từ localStorage
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+
+      if (storedUser && storedUser.user_id) {
+        userId.value = storedUser.user_id; // Lấy user_id từ localStorage
+      }
+
       if (!user.value) {
         window.location.href = "/login"; // Chuyển hướng nếu chưa đăng nhập
       } else {
@@ -118,10 +125,11 @@ export default {
       }
     };
 
-    return { user, nameInput, emailInput, phoneInput, shippingAddressInput, saveChanges };
+    return { user, nameInput, emailInput, phoneInput, shippingAddressInput, saveChanges, userId };
   },
 };
 </script>
+
 
 
 <style scoped></style>
