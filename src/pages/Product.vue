@@ -1,25 +1,18 @@
 <template>
-	<!-- Product section-->
 	<div class="container min-vh-100">
 		<section class="py-5">
 			<div class="px-4 px-lg-5 my-5">
 				<Spinner v-if="loading" />
-
-				<!-- Danh mục / Tiêu đề -->
 				<p class="text-muted mb-5" v-if="product && !loading">
 					THỜI TRANG | {{ product.category?.toUpperCase() }} | {{ product.name?.toUpperCase() }}
 				</p>
-
 				<div class="row gx-4 gx-lg-5 align-items-center" v-if="product">
 					<div class="col-md-5 position-relative">
-						<!-- Hình ảnh lớn -->
 						<img v-if="product.images && product.images.length > 0" class="card-img-top mb-5 mb-md-0"
 							:src="'/images/' + currentImage" :alt="product.name" />
-						<!-- Thêm hình ảnh mặc định nếu không có hình ảnh -->
 						<img v-else class="card-img-top mb-5 mb-md-0" src="/images/default-image.jpg"
 							alt="No image available" />
 
-						<!-- Các hình ảnh thu nhỏ bao quanh hình ảnh lớn -->
 						<div class="thumbnails">
 							<div v-for="(image, index) in product.images" :key="index" class="thumbnail"
 								@click="changeImage(image)">
@@ -36,13 +29,11 @@
 							<span>{{ getCurrentPrice() }} VNĐ</span>
 						</div>
 
-						<!-- Mô tả sản phẩm -->
 						<p class="lead" :class="{ 'collapsed': !showMoreDescription }">{{ product.description }}</p>
 						<button class="btn btn-link" @click="toggleDescription">
 							{{ showMoreDescription ? 'Thu gọn' : 'Xem thêm' }}
 						</button>
 
-						<!-- Chọn kích cỡ -->
 						<div class="col-md-12 mb-3">
 							<label class="mb-1">Chọn kích cỡ:</label>
 							<div class="col-md">
@@ -53,7 +44,6 @@
 							</div>
 						</div>
 
-						<!-- Chọn màu sắc -->
 						<div class="col-md-12 mb-3" v-if="currentSize">
 							<label class="mb-1">Chọn màu sắc:</label>
 							<div class="d-flex flex-wrap">
@@ -64,15 +54,13 @@
 							</div>
 						</div>
 
-						<!-- Chọn số lượng -->
 						<div class="d-flex flex-wrap">
 							<div class="btn-group me-3">
 								<button type="button" class="btn btn-outline-dark" @click="decrease">-</button>
 								<button type="button" class="btn btn-outline-dark">{{ quantity }}</button>
 								<button type="button" class="btn btn-outline-dark" @click="increase">+</button>
 							</div>
-							<button class="btn btn-outline-dark flex-shrink-0" type="button"
-								v-add-to-cart="{ $store, item: { ...product, quantity, currentSize, currentColor } }">
+							<button class="btn btn-outline-dark flex-shrink-0" type="button" @click="addToCart">
 								<i class="bi-cart-fill me-1"></i>
 								Thêm vào giỏ hàng
 							</button>
@@ -83,7 +71,6 @@
 			</div>
 		</section>
 
-		<!-- Sản phẩm liên quan -->
 		<section class="py-5 bg-light" v-if="product">
 			<div class="px-4 px-lg-5 my-5">
 				<h2 class="fw-bolder mb-4">Sản phẩm liên quan</h2>
@@ -98,86 +85,75 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import Products from '../components/Products.vue';
-import Spinner from '../components/Spinner.vue';
+import { useStore } from 'vuex';
 import { publicRequest } from "../requestMethod.js";
 
+const store = useStore();  // Gọi useStore() đúng cách
 const product = ref(null);
 const loading = ref(true);
 const productId = ref(null);
 const currentImage = ref('');
 const currentSize = ref('');
 const currentColor = ref('');
-const quantity = ref(1);  // Số lượng mặc định
+const quantity = ref(1);
 const sizes = ref([]);
 const colors = ref([]);
 const filteredColors = ref([]);
-const showMoreDescription = ref(false); // Trạng thái "Xem thêm"
+const showMoreDescription = ref(false);
 
 const route = useRoute();
 
-// Hàm lấy giá hiện tại (tùy theo biến `product`)
 const getCurrentPrice = () => {
 	return product.value?.variants?.find(variant => variant.size === currentSize.value && variant.color === currentColor.value)?.price || product.value.base_price;
 };
 
-// Hàm để toggle mô tả sản phẩm (Xem thêm / Thu gọn)
 const toggleDescription = () => {
 	showMoreDescription.value = !showMoreDescription.value;
 };
 
-// Hàm thay đổi hình ảnh khi người dùng chọn hình thu nhỏ
 const changeImage = (image) => {
-	currentImage.value = image;  // Cập nhật hình ảnh lớn khi người dùng chọn hình thu nhỏ
+	currentImage.value = image;
 };
 
-// Hàm tăng số lượng
 const increase = () => {
-	if (quantity.value < 99) { // Giới hạn số lượng tối đa là 99
+	if (quantity.value < 99) {
 		quantity.value += 1;
 	}
 };
 
-// Hàm giảm số lượng
 const decrease = () => {
-	if (quantity.value > 1) { // Giới hạn số lượng tối thiểu là 1
+	if (quantity.value > 1) {
 		quantity.value -= 1;
 	}
 };
 
-// Hàm chọn kích cỡ
 const toggleSize = (size) => {
-	currentSize.value = size; // Cập nhật kích cỡ khi người dùng chọn
-	// Lọc màu sắc tương ứng với kích cỡ đã chọn
+	currentSize.value = size;
 	filteredColors.value = product.value.variants
 		.filter(variant => variant.size === currentSize.value)
 		.map(variant => variant.color);
-	currentColor.value = ''; // Reset màu sắc khi thay đổi kích cỡ
+	currentColor.value = '';
 };
 
-// Hàm chọn màu sắc
 const toggleColor = (color) => {
-	currentColor.value = color; // Cập nhật màu sắc khi người dùng chọn
+	currentColor.value = color;
 };
 
-// Hàm lấy chi tiết sản phẩm
 const fetchProductDetail = async (id) => {
 	loading.value = true;
 
 	try {
 		const response = await publicRequest.get(`/product/getvariants/${id}`);
-		console.log(response.data);  // Kiểm tra dữ liệu nhận được từ API
+		console.log(response.data);
 
 		if (response && response.data && response.data.data) {
-			product.value = response.data.data;  // Gán dữ liệu sản phẩm vào `product`
+			product.value = response.data.data;
 			if (!product.value.images || product.value.images.length === 0) {
 				console.error('Product images are missing or empty');
 			}
-			currentImage.value = product.value.images[0]; // Mặc định chọn hình ảnh đầu tiên
-
-			// Lấy danh sách kích cỡ và màu sắc từ `variants`
-			sizes.value = [...new Set(product.value.variants.map(v => v.size))]; // Lọc các kích cỡ duy nhất
-			colors.value = [...new Set(product.value.variants.map(v => v.color))]; // Lọc các màu sắc duy nhất
+			currentImage.value = product.value.images[0];
+			sizes.value = [...new Set(product.value.variants.map(v => v.size))];
+			colors.value = [...new Set(product.value.variants.map(v => v.color))];
 		} else {
 			console.error('Product data is missing or invalid');
 		}
@@ -188,9 +164,43 @@ const fetchProductDetail = async (id) => {
 	}
 };
 
+const addToCart = async () => {
+	const userId = JSON.parse(localStorage.getItem("user"))?.user_id;
+
+	if (!userId) {
+		store.dispatch('addNotification', 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+		return;
+	}
+
+	const selectedVariant = product.value?.variants?.find(v => v.size === currentSize.value && v.color === currentColor.value);
+
+	if (!selectedVariant) {
+		store.dispatch('addNotification', 'Vui lòng chọn kích cỡ và màu sắc trước khi thêm vào giỏ hàng.');
+		return;
+	}
+
+	try {
+		const response = await publicRequest.post("/cart/addtocart", {
+			user_id: userId,
+			product_variant_id: selectedVariant.id,
+			quantity: quantity.value
+		});
+
+		// Thông báo thành công nếu mã phản hồi là 200
+		if (response.data.code === 200) {
+			store.dispatch('addNotification', 'Sản phẩm đã được thêm vào giỏ hàng thành công!');
+		} else {
+			store.dispatch('addNotification', 'Sản phẩm đã được thêm vào giỏ hàng thành công!');
+		}
+	} catch (error) {
+		console.error("Lỗi khi thêm vào giỏ hàng:", error.response?.data || error.message);
+		store.dispatch('addNotification', 'Có lỗi xảy ra, vui lòng thử lại sau.');
+	}
+};
+
 onMounted(() => {
 	productId.value = parseInt(route.params.id);
-	console.log('Product ID from URL:', productId.value);  // Kiểm tra giá trị ID
+	console.log('Product ID from URL:', productId.value);
 	if (productId.value) {
 		fetchProductDetail(productId.value);
 	} else {
@@ -202,8 +212,9 @@ onMounted(() => {
 
 
 
+
+
 <style scoped>
-/* Các hình ảnh thu nhỏ bao quanh hình ảnh lớn */
 .position-relative {
 	display: flex;
 	justify-content: center;
@@ -214,16 +225,11 @@ onMounted(() => {
 .thumbnails {
 	position: absolute;
 	bottom: 10px;
-	/* Cách đáy hình ảnh lớn 10px */
 	right: 10px;
-	/* Cách bên phải hình ảnh lớn 10px */
 	display: flex;
 	flex-direction: column;
-	/* Sắp xếp hình thu nhỏ theo chiều dọc */
 	gap: 10px;
-	/* Khoảng cách giữa các hình ảnh thu nhỏ */
 	z-index: 2;
-	/* Đặt z-index cao để hình thu nhỏ không bị che khuất */
 }
 
 .thumbnail {
@@ -236,13 +242,11 @@ onMounted(() => {
 	object-fit: cover;
 	border-radius: 5px;
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-	/* Thêm bóng để nổi bật các hình thu nhỏ */
 }
 
 .card-img-top {
 	width: 100%;
 	z-index: 1;
-	/* Đảm bảo hình ảnh lớn nằm dưới các hình thu nhỏ */
 }
 
 .color-filter {
@@ -263,7 +267,6 @@ onMounted(() => {
 	text-overflow: ellipsis;
 	display: -webkit-box;
 	-webkit-line-clamp: 3;
-	/* Chỉ hiển thị 3 dòng */
 	-webkit-box-orient: vertical;
 }
 </style>

@@ -81,13 +81,19 @@ export default {
 
         this.login(user); // ✅ Cập nhật user vào trạng thái toàn cục
 
-        this.$router.push("/profile");
+        // ✅ Kiểm tra nếu role là admin, chuyển hướng tới trang /admin
+        if (user.role === "admin") {
+          this.$router.push("/admin");
+        } else {
+          this.$router.push("/profile");
+        }
       } catch (error) {
         console.error("Lỗi đăng nhập:", error);
         this.errors.push(error.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
         this.isLoading = false;
       }
     }
+
   }
 };
 </script>

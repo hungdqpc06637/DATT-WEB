@@ -5,18 +5,30 @@
       <div class="col-md-8">
         <h1 class="fw-bold text-uppercase mb-4">Giỏ hàng của bạn</h1>
         <hr class="border-gold">
+
         <!-- Hiển thị sản phẩm trong giỏ hàng -->
-        <CartItem v-for="(item, index) in cart" :key="item.id + '-' + index" :item="item" @remove="removeItem(item.id)"
+        <CartItem v-for="(item, index) in paginatedCart" :key="item.id + '-' + index" :item="item" @remove="removeItem"
           @update="updateQuantity(item.id, $event)" />
 
+
+        <!-- Nếu giỏ hàng trống -->
         <div v-if="cart.length === 0" class="text-center mt-5">
           <p class="text-muted">🛒 Giỏ hàng của bạn đang trống.</p>
           <router-link to="/products">
             <button class="btn btn-dark">Tiếp tục mua sắm</button>
           </router-link>
         </div>
+
+        <!-- Nút phân trang -->
+        <div v-if="totalPages > 1" class="pagination-container text-center mt-4">
+          <button v-for="page in totalPages" :key="page" class="btn btn-light mx-1"
+            :class="{ 'btn-dark': currentPage === page }" @click="goToPage(page)">
+            {{ page }}
+          </button>
+        </div>
       </div>
 
+      <!-- Tóm tắt đơn hàng -->
       <div class="col-md-4">
         <div class="card mb-3 sticky-top summary">
           <div class="card-body">
@@ -30,7 +42,6 @@
                 <strong>Tổng cộng</strong>
                 <strong class="text-gold">{{ total.toFixed(2) }}₫</strong>
               </li>
-
             </ul>
             <router-link to="/checkout">
               <button type="button" class="btn btn-gold w-100">Thanh toán ngay</button>
@@ -41,6 +52,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import CartItem from '../components/CartItem.vue';
@@ -55,7 +67,19 @@ export default {
       cart: [], // Giỏ hàng
       subTotal: 0, // Tổng phụ
       total: 0, // Tổng cộng
+      currentPage: 1, // Trang hiện tại
+      itemsPerPage: 4, // Số lượng sản phẩm mỗi trang
     };
+  },
+  computed: {
+    paginatedCart() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = this.currentPage * this.itemsPerPage;
+      return this.cart.slice(start, end); // Lấy sản phẩm tương ứng với trang
+    },
+    totalPages() {
+      return Math.ceil(this.cart.length / this.itemsPerPage); // Tổng số trang
+    },
   },
   mounted() {
     this.userID = this.getUserIDFromLocalStorage(); // Lấy userID từ localStorage
@@ -66,6 +90,11 @@ export default {
     }
   },
   methods: {
+    goToPage(pageNumber) {
+      if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+        this.currentPage = pageNumber;
+      }
+    },
     // Hàm lấy user_id từ localStorage
     getUserIDFromLocalStorage() {
       const user = localStorage.getItem('user'); // Lấy đối tượng user từ localStorage
@@ -86,8 +115,15 @@ export default {
 
         const response = await publicRequest.get(`/cart/get?user_id=${this.userID}`);
 
-        if (response.data.code === 200 && response.data.data) {
-          this.cart = response.data.data; // Lưu dữ liệu giỏ hàng
+        if (response.data.code === 200) {
+          // Kiểm tra nếu dữ liệu giỏ hàng là null hoặc undefined
+          if (!response.data.data || response.data.data.length === 0) {
+            this.cart = [];  // Giỏ hàng trống
+            console.log("Giỏ hàng trống");
+          } else {
+            this.cart = response.data.data; // Lưu dữ liệu giỏ hàng
+            console.log("Giỏ hàng được tải lại:", this.cart);
+          }
           this.calculateTotal(); // Tính toán lại tổng
         } else {
           console.error("Failed to fetch cart data", response.data.message);
@@ -96,14 +132,47 @@ export default {
         console.error("Error fetching cart data:", error);
       }
     },
+    async removeItem(productVariantId) {
+      const userId = this.getUserIDFromLocalStorage();
+      if (!userId) {
+        console.error("User ID không tồn tại");
+        return;
+      }
 
-    // Cập nhật giỏ hàng khi xóa sản phẩm
-    removeItem(id) {
-      // Lọc giỏ hàng và loại bỏ sản phẩm với id được chọn
-      this.cart = this.cart.filter(item => item.id !== id);
-      this.calculateTotal(); // Tính lại tổng sau khi xóa sản phẩm
-    },
+      const requestData = {
+        user_id: userId,
+        product_variant_id: productVariantId
+      };
 
+      console.log("Dữ liệu gửi đi:", requestData);  // Kiểm tra dữ liệu gửi đi
+
+      try {
+        const response = await publicRequest.delete('/cart/delete', {
+          headers: { "Content-Type": "application/json" },
+          data: requestData
+        });
+
+        console.log("Phản hồi từ API:", response);  // In thông tin phản hồi
+
+        if (response.status === 200) {
+          // Xóa sản phẩm thành công
+          console.log("Xóa sản phẩm thành công");
+
+          // Gọi lại fetchCartData để tải lại giỏ hàng sau khi xóa sản phẩm
+          await this.fetchCartData();  // Tải lại dữ liệu giỏ hàng
+
+          // Tính lại tổng giỏ hàng
+          this.calculateTotal();
+        } else {
+          // Thông báo khi có lỗi từ server
+          console.error("Có lỗi xảy ra khi xóa sản phẩm:", response.data.message || "Không có thông báo lỗi");
+        }
+      } catch (error) {
+        // In lỗi khi có lỗi trong quá trình gọi API
+        console.error("Lỗi khi xóa sản phẩm:", error);
+      }
+    }
+    ,
     updateQuantity(id, amount) {
       const product = this.cart.find(item => item.id === id);
       if (product) {

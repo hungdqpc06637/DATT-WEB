@@ -7,7 +7,7 @@
 		<section class="product-lists mt-5">
 			<div class="row text-center">
 				<div class="col-md-12 mb-2">
-					<h1 class="fw-bold">SẢN PHẨM THỊNH HÀNH</h1>
+					<h1 class="fw-bold">SẢN PHẨM MỚI NHẤT</h1>
 				</div>
 				<!-- <BarChart v-if="!products.isLoading" :products="products.data"/> -->
 				<Products :filter="{limit:5}" />
@@ -38,7 +38,6 @@
 
 <script>
 import Slider from '../components/Slider.vue';
-import Categories from '../components/Categories.vue';
 import Newsletter from '../components/Newsletter.vue';
 import Products from '../components/Products.vue';
 import BarChart from '../components/BarChart.vue';
@@ -47,7 +46,6 @@ import { mapState } from 'vuex';
 export default {
 	components: {
 		Slider,
-		Categories,
 		Newsletter,
 		Products,
 		BarChart

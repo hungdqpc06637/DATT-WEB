@@ -32,12 +32,18 @@
               SẢN PHẨM
             </a>
             <ul class="dropdown-menu">
-              <li><router-link class="dropdown-item" to="/products">Áo</router-link></li>
-              <li><router-link class="dropdown-item" to="/products">Quần</router-link></li>
-              <li><router-link class="dropdown-item" to="/products">Giày Dép</router-link></li>
-              <li><router-link class="dropdown-item" to="/products">Phụ Kiện</router-link></li>
+              <li v-for="category in categories" :key="category.id">
+                <router-link class="dropdown-item d-flex align-items-center" :to="`/products?category=${category.id}`">
+                  <!-- ✅ Hiển thị hình ảnh -->
+                  <img :src="`/images/${category.image_url}`" class="me-2 rounded" width="25" height="25"
+                    alt="category.name">
+                  {{ category.name }}
+                </router-link>
+              </li>
             </ul>
           </li>
+
+
 
           <!-- Dropdown Giới thiệu -->
           <li class="nav-item dropdown">
@@ -75,7 +81,8 @@
               <span class="mx-2">{{ user.username }}</span>
             </a>
             <ul class="dropdown-menu">
-              <li><router-link class="dropdown-item" to="/profile"><i class="bi bi-person-circle"></i> Trang cá nhân</router-link></li>
+              <li><router-link class="dropdown-item" to="/profile"><i class="bi bi-person-circle"></i> Trang cá
+                  nhân</router-link></li>
               <li>
                 <button class="dropdown-item text-danger" @click="logout">
                   <i class="bi bi-door-closed-fill"></i> Đăng xuất
@@ -101,31 +108,44 @@
 
 
 <script>
-import { onMounted ,ref } from "vue";
-import { useAuth } from "../composables/useAuth"; // ✅ Import useAuth
+import { onMounted, ref } from "vue";
+import { useAuth } from "../composables/useAuth";
 import { useRouter } from 'vue-router';
+import { publicRequest } from '../requestMethod.js';
 
 export default {
   setup() {
     const { user, loadUser, logout } = useAuth();
-    const router = useRouter();  // ✅ Khai báo useRouter để điều hướng
+    const router = useRouter();
     const isNavbarOpen = ref(false);
-    onMounted(loadUser);
+    const categories = ref([]); // ✅ Danh sách danh mục sản phẩm
 
-     // ✅ Hàm toggle menu
-     const toggleNavbar = () => {
+    onMounted(async () => {
+      loadUser();
+      try {
+        const response = await publicRequest.get("/caterogy/get");
+        console.log("Dữ liệu danh mục:", response.data);
+        categories.value = response.data.data; // ✅ Lưu danh mục vào biến
+      } catch (error) {
+        console.error("Lỗi khi lấy danh mục:", error);
+      }
+    });
+
+    const toggleNavbar = () => {
       isNavbarOpen.value = !isNavbarOpen.value;
     };
 
-    // ✅ Sử dụng router.push() đúng cách trong setup
     const goToProducts = () => {
       router.push('/products');
     };
 
-    return { user, logout, goToProducts, toggleNavbar, isNavbarOpen };
+    return {
+      user, logout, goToProducts, toggleNavbar, isNavbarOpen, categories
+    };
   }
 };
 </script>
+
 
 <style scoped>
 .announcement {
@@ -236,8 +256,7 @@ export default {
 }
 
 .navbar-toggler {
-  z-index: 1051; /* Đảm bảo nút toggle nổi bật hơn các phần tử khác */
+  z-index: 1051;
+  /* Đảm bảo nút toggle nổi bật hơn các phần tử khác */
 }
-
-
 </style>

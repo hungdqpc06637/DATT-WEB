@@ -1,6 +1,8 @@
 <template>
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <Notification v-for="notification in notifications.data" :toastId="notification.id" :desc="notification.desc"/>
+    <!-- Render thông báo từ Vuex store -->
+    <Notification v-for="notification in notifications" :key="notification.id" :toastId="notification.id"
+      :desc="notification.desc" />
   </div>
 </template>
 
@@ -12,14 +14,13 @@ export default {
   components: {
     Notification
   },
-	computed: {
-		...mapState({
-			// Map `notifications` from store
-			notifications: state => state.notifications
-		})
-	},
+  computed: {
+    ...mapState({
+      // Map `notifications.data` từ Vuex store
+      notifications: state => state.notifications.data
+    })
+  }
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
