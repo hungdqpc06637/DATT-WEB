@@ -1,65 +1,68 @@
-const state = {
-  data: [
+// store/modules/cart.js
+import { publicRequest } from '../../requestMethod.js';
 
-  ]
-}
+const state = {
+  cartItems: [],
+};
 
 const mutations = {
-  ADD_TO_CART(state, item) {
-    const index = state.data.findIndex(p => p.pid === item.pid)
-    if (index !== -1) {
-
-      console.log(state.data[index].choosedType)
-      console.log(item.choosedType)
-      console.log(state.data[index].choosedType == item.choosedType)
-      // only add if the two items have the same types and options
-      if (state.data[index].choosedType === item.choosedType && state.data[index].choosedOptions === item.choosedOptions) {
-        state.data[index].quantity += item.quantity
-        return;
-      }
-    }
-    state.data.push(item)
+  setCartItems(state, items) {
+    state.cartItems = [...items]; // Cập nhật lại toàn bộ giỏ hàng
   },
-  REMOVE_FROM_CART(state, productId) {
-    const index = state.data.findIndex(p => p.pid === productId)
-    if (index !== -1) {
-      state.data.splice(index, 1)
+  updateCartItem(state, { productId, quantity }) {
+    const item = state.cartItems.find((item) => item.id === productId);
+    if (item) {
+      item.quantity = quantity; // Cập nhật số lượng sản phẩm
     }
   },
-  RESET_CART(state) {
-    state.data = []
-  }
-}
-
-const actions = {
-  addToCart({ commit }, payload) {
-    commit('ADD_TO_CART', payload)
-  },
-  removeFromCart({ commit }, payload) {
-    commit('REMOVE_FROM_CART', payload)
-  },
-  resetCart({ commit }) {
-    commit('RESET_CART')
-  }
-}
+};
 
 const getters = {
-  getCart: (state) => {
-    return state.data
+  cartItemCount: (state) => {
+    return state.cartItems.reduce((total, item) => total + item.quantity, 0); // Trả về tổng số lượng sản phẩm trong giỏ
   },
-	getCartSize: (state) => {
-		return state.data.length
-	},
-  getCartTotal: (state) => {
-    return state.data.reduce((acc, cur) => {
-      return acc + (cur.quantity * cur.price)
-    }, 0)
+};
+
+const actions = {
+  async fetchCartData({ commit }, userId) {
+    try {
+      const response = await publicRequest.get(`/cart/get?user_id=${userId}`);
+
+      if (response.data.code === 200) {
+        commit('setCartItems', response.data.data || []); // Cập nhật giỏ hàng vào Vuex
+        console.log("Giỏ hàng đã được tải lại:", response.data.data);
+      } else {
+        console.error("Có lỗi khi tải giỏ hàng:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu giỏ hàng:", error);
+    }
+  },
+
+  async addToCart({ dispatch }, { userId, productVariantId, quantity }) {
+    try {
+      const response = await publicRequest.post("/cart/addtocart", {
+        user_id: userId,
+        product_variant_id: productVariantId,
+        quantity: quantity,
+      });
+
+      if (response.data && response.data.message === "Product added to cart successfully") {
+        console.log('Sản phẩm đã được thêm vào giỏ hàng thành công!');
+        await dispatch('fetchCartData', userId); // Tải lại giỏ hàng sau khi thêm sản phẩm
+      } else {
+        console.error("Lỗi từ API:", response.data);
+      }
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+    }
   }
-}
+};
 
 export default {
+  namespaced: true,
   state,
   mutations,
-  actions,
-  getters
-}
+  getters,
+  actions
+};

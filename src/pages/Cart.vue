@@ -8,7 +8,7 @@
 
         <!-- Hiển thị sản phẩm trong giỏ hàng -->
         <CartItem v-for="(item, index) in paginatedCart" :key="item.id + '-' + index" :item="item" @remove="removeItem"
-          @update="updateQuantity(item.id, $event)" />
+          @update="updateQuantity" />
 
 
         <!-- Nếu giỏ hàng trống -->
@@ -36,11 +36,11 @@
             <ul class="list-group list-group-flush my-3">
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 Tạm tính
-                <span>{{ subTotal.toFixed(2) }}₫</span>
+                <span>{{ formatPrice(subTotal) }}₫</span>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center border-top pt-3">
                 <strong>Tổng cộng</strong>
-                <strong class="text-gold">{{ total.toFixed(2) }}₫</strong>
+                <strong class="text-gold">{{ formatPrice(total) }}₫</strong>
               </li>
             </ul>
             <router-link to="/checkout">
@@ -49,6 +49,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -90,6 +91,9 @@ export default {
     }
   },
   methods: {
+    formatPrice(value) {
+      return new Intl.NumberFormat('vi-VN').format(value);
+    },
     goToPage(pageNumber) {
       if (pageNumber >= 1 && pageNumber <= this.totalPages) {
         this.currentPage = pageNumber;
@@ -124,6 +128,9 @@ export default {
             this.cart = response.data.data; // Lưu dữ liệu giỏ hàng
             console.log("Giỏ hàng được tải lại:", this.cart);
           }
+
+          // Lưu giỏ hàng vào Vuex
+          this.$store.commit('cart/setCartItems', this.cart);  // Gọi mutation để cập nhật giỏ hàng vào Vuex
           this.calculateTotal(); // Tính toán lại tổng
         } else {
           console.error("Failed to fetch cart data", response.data.message);
@@ -131,7 +138,8 @@ export default {
       } catch (error) {
         console.error("Error fetching cart data:", error);
       }
-    },
+    }
+    ,
     async removeItem(productVariantId) {
       const userId = this.getUserIDFromLocalStorage();
       if (!userId) {
@@ -144,43 +152,78 @@ export default {
         product_variant_id: productVariantId
       };
 
-      console.log("Dữ liệu gửi đi:", requestData);  // Kiểm tra dữ liệu gửi đi
-
       try {
         const response = await publicRequest.delete('/cart/delete', {
           headers: { "Content-Type": "application/json" },
           data: requestData
         });
 
-        console.log("Phản hồi từ API:", response);  // In thông tin phản hồi
+        console.log("Phản hồi từ API:", response);  // Kiểm tra phản hồi API
 
         if (response.status === 200) {
-          // Xóa sản phẩm thành công
           console.log("Xóa sản phẩm thành công");
 
-          // Gọi lại fetchCartData để tải lại giỏ hàng sau khi xóa sản phẩm
-          await this.fetchCartData();  // Tải lại dữ liệu giỏ hàng
+          // ✅ Cập nhật Vuex bằng cách lọc sản phẩm vừa xóa
+          const updatedCart = this.$store.state.cart.cartItems.filter(item => item.id !== productVariantId);
+          this.$store.commit("cart/setCartItems", updatedCart);
+
+          // ✅ Tải lại dữ liệu giỏ hàng
+          await this.fetchCartData();
+
+          // ✅ Tính lại tổng giỏ hàng
+          this.calculateTotal();
+        } else {
+          console.error("Có lỗi xảy ra khi xóa sản phẩm:", response.data.message || "Không có thông báo lỗi");
+        }
+      } catch (error) {
+        console.error("Lỗi khi xóa sản phẩm:", error);
+      }
+    }
+
+    ,
+    async updateQuantity(productVariantId, quantity) {
+      const userId = this.getUserIDFromLocalStorage(); // Lấy user_id từ localStorage
+
+      // Kiểm tra nếu chưa đăng nhập
+      if (!userId) {
+        this.$store.dispatch('addNotification', 'Vui lòng đăng nhập để thay đổi số lượng sản phẩm!');
+        return;
+      }
+
+      // Dữ liệu gửi đến API
+      const requestData = {
+        user_id: userId,
+        product_variant_id: productVariantId,
+        quantity: quantity
+      };
+
+      try {
+        const response = await publicRequest.put("/cart/update", requestData);
+
+        // Kiểm tra phản hồi từ API
+        if (response.data.message === 'Cập nhật số lượng sản phẩm thành công') {
+          this.$store.dispatch('addNotification', 'Cập nhật số lượng sản phẩm thành công!');
+          this.$store.commit('cart/updateCartItem', { productId: productVariantId, quantity });
+
+          // Cập nhật giỏ hàng trong state
+          const cartItem = this.cart.find(item => item.product_variants[0]?.variants[0]?.id === productVariantId);
+          if (cartItem) {
+            cartItem.quantity = quantity;  // Cập nhật số lượng trực tiếp trong giỏ hàng
+          }
 
           // Tính lại tổng giỏ hàng
           this.calculateTotal();
         } else {
-          // Thông báo khi có lỗi từ server
-          console.error("Có lỗi xảy ra khi xóa sản phẩm:", response.data.message || "Không có thông báo lỗi");
+          this.$store.dispatch('addNotification', 'Có lỗi xảy ra khi cập nhật số lượng, vui lòng thử lại.');
         }
       } catch (error) {
-        // In lỗi khi có lỗi trong quá trình gọi API
-        console.error("Lỗi khi xóa sản phẩm:", error);
+        console.error("Lỗi khi cập nhật số lượng sản phẩm:", error);
+        this.$store.dispatch('addNotification', 'Có lỗi xảy ra, vui lòng thử lại sau.');
       }
     }
+
+
     ,
-    updateQuantity(id, amount) {
-      const product = this.cart.find(item => item.id === id);
-      if (product) {
-        product.quantity += amount;
-        if (product.quantity < 1) product.quantity = 1; // Số lượng tối thiểu là 1
-        this.calculateTotal(); // Tính lại tổng sau khi thay đổi số lượng
-      }
-    },
     // Hàm tính tổng
     calculateTotal() {
       this.subTotal = this.cart.reduce((total, item) => {
