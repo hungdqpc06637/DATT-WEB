@@ -3,12 +3,15 @@
 		<div class="product-circle" />
 		<img class="product-image" :src="imageUrl" :alt="product.name || 'Sản phẩm không có tên'" />
 
+		<!-- Thông tin sản phẩm: Luôn hiển thị tên và giá -->
 		<div class="product-info">
-			<label class="product-title">{{ product.name }}</label>
+			<router-link :to="'/product/' + product.id" class="text-dark text-decoration-none">
+				<label class="product-title">{{ product.name }}</label>
+			</router-link>
+			<span class="product-price">
+				{{ (product.base_price ?? 0).toLocaleString() }}₫
+			</span>
 			<div class="product-icons">
-				<div class="product-icon" @click="addToCart">
-					<i class="bi bi-cart-plus-fill"></i>
-				</div>
 				<router-link :to="'/product/' + product.id" class="text-dark text-decoration-none">
 					<div class="product-icon">
 						<i class="bi bi-eye"></i>
@@ -34,8 +37,8 @@ const props = defineProps({
 const imageUrl = computed(() => {
 	return props.image_url ? `/images/${props.image_url}` : "/images/default-image.jpg";
 });
-</script>
 
+</script>
 
 
 
@@ -44,66 +47,82 @@ const imageUrl = computed(() => {
 	flex: 1;
 	margin: 5px;
 	min-width: 250px;
-	height: 250px;
+	height: 280px;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	justify-content: center;
+	justify-content: flex-start;
 	position: relative;
+	border-radius: 10px;
+	overflow: hidden;
+	padding-bottom: 10px;
 }
 
-.product-container:hover .product-info {
-	opacity: 1;
-}
-
-.product-circle {
-	width: 80px;
-	height: 80px;
-	border-radius: 50%;
-	background-color: white;
-	position: absolute;
-	z-index: 1;
-}
-
+/* Hình ảnh luôn nằm gọn trong khung */
 .product-image {
 	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	border-radius: 10%;
+	height: 180px;
+	/* Điều chỉnh chiều cao */
+	object-fit: contain;
+	/* Giữ nguyên tỷ lệ ảnh, không bị cắt */
+	border-radius: 10px;
 	z-index: 2;
+	background-color: white;
+	/* Đảm bảo ảnh có nền đồng bộ */
 }
 
+/* Thông tin sản phẩm (Tên + Giá) */
 .product-info {
-	opacity: 0;
 	width: 100%;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	left: 0;
+	text-align: center;
+	padding: 10px;
 	z-index: 3;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.5s ease;
-	cursor: pointer;
-	border-radius: 10px;
-	padding: 10px;
 }
 
+/* Tên sản phẩm */
 .product-title {
-	color: rgb(0, 0, 0);
-	background-color: rgba(255, 255, 255, 0.8);
+	color: #333;
+	background-color: rgba(255, 255, 255, 0.9);
 	text-align: center;
 	border-radius: 5px;
-	margin-bottom: 5px;
-	padding: 3px;
+	padding: 5px;
+	font-size: 16px;
+	font-weight: bold;
+	max-width: 90%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
+/* Giá sản phẩm */
+.product-price {
+	color: #e74c3c;
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 5px;
+}
+
+/* Mặc định ẨN icon */
 .product-icons {
 	display: flex;
-	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 
+/* Khi hover vào ảnh, hiện icon */
+.product-container:hover .product-icons {
+	opacity: 1;
+}
+
+/* Style icon */
 .product-icon {
 	width: 40px;
 	height: 40px;

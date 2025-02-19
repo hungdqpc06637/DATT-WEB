@@ -50,20 +50,12 @@
             <a class="nav-link nav-underline" href="#" data-bs-toggle="dropdown">
               GIỚI THIỆU
             </a>
-            <ul class="dropdown-menu">
+            <!-- <ul class="dropdown-menu">
               <li><router-link class="dropdown-item" to="#">Về chúng tôi</router-link></li>
               <li><router-link class="dropdown-item" to="#">Liên hệ</router-link></li>
-            </ul>
+            </ul> -->
           </li>
         </ul>
-
-        <!-- 🔎 Ô tìm kiếm -->
-        <form class="d-flex search-bar">
-          <input class="form-control me-2" type="search" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
-          <button class="btn btn-dark" type="submit">
-            <i class="bi bi-search"></i>
-          </button>
-        </form>
 
         <!-- 🔘 Nút đăng nhập / tài khoản -->
         <ul class="navbar-nav ms-auto">

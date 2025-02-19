@@ -48,16 +48,6 @@
                 </select>
               </div>
 
-              <!-- Lọc theo màu sắc -->
-              <div class="form-group mb-3">
-                <label>Màu sắc:</label>
-                <div class="d-flex">
-                  <button v-for="color in colors" :key="color" :style="{ backgroundColor: color }" class="color-filter"
-                    @click="filter.color = color">
-                  </button>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>

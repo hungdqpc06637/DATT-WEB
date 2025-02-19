@@ -71,8 +71,6 @@ export default {
     publicRequest
       .post(`/order/get`, { user_id: this.userId })
       .then((res) => {
-        // Log dữ liệu trả về từ API để kiểm tra
-        console.log("Dữ liệu trả về từ API:", res.data);
 
         // Kiểm tra xem dữ liệu trả về có phải là mảng không
         if (Array.isArray(res.data.data)) {

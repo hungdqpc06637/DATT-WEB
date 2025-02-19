@@ -19,7 +19,6 @@ export function useAuth() {
   const store = useStore(); // ✅ Sử dụng Vuex Store
 
   const logout = () => {
-    console.log("🚪 Đang đăng xuất...");
 
     // 🗑️ Xóa toàn bộ dữ liệu người dùng
     localStorage.removeItem("user");

@@ -13,7 +13,6 @@
             </div>
             <span class="text-body-secondary">{{ (item.price * item.quantity).toLocaleString() }} VNĐ</span>
           </li>
-
           <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
             <div class="text-success">
               <h6 class="my-0">Giảm giá</h6>
@@ -34,7 +33,8 @@
           </div>
         </div>
         <div class="card p-2">
-          <textarea class="form-control" id="comment" rows="3" placeholder="Ghi chú đơn hàng..." v-model="noteInput"></textarea>
+          <textarea class="form-control" id="comment" rows="3" placeholder="Ghi chú đơn hàng..."
+            v-model="noteInput"></textarea>
         </div>
       </div>
 
@@ -47,23 +47,17 @@
               <input type="text" class="form-control" id="name" placeholder="Nguyễn Văn A" v-model="user.name" required>
             </div>
             <div class="col-sm-6">
-              <label for="username" class="form-label">Tên tài khoản</label>
-              <div class="input-group has-validation">
-                <span class="input-group-text">@</span>
-                <input type="text" class="form-control" id="username" placeholder="Tên tài khoản" required>
-              </div>
-            </div>
-            <div class="col-12">
-              <label for="email" class="form-label">Email <span class="text-body-secondary">(Không bắt buộc)</span></label>
-              <input type="email" class="form-control" id="email" placeholder="example@email.com" v-model="user.email">
-            </div>
-            <div class="col-12">
-              <label for="address" class="form-label">Địa chỉ</label>
-              <input type="text" class="form-control" id="address" placeholder="123 Đường ABC, Quận XYZ" v-model="user.shippingAddress" required>
-            </div>
-            <div class="col-12">
               <label for="phone" class="form-label">Số điện thoại</label>
-              <input type="text" class="form-control" id="phone" placeholder="Số điện thoại..." v-model="user.phone" required>
+              <input type="text" class="form-control" id="phone" placeholder="Số điện thoại..." v-model="user.phone"
+                required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Địa chỉ giao hàng</label>
+              <div class="form-check" v-for="address in user.addresses" :key="address.id">
+                <input class="form-check-input" type="radio" :id="'address-' + address.id" :value="address"
+                  v-model="user.shippingAddress">
+                <label class="form-check-label" :for="'address-' + address.id">{{ address }}</label>
+              </div>
             </div>
           </div>
 
@@ -72,32 +66,30 @@
           <h4 class="mb-3">Phương thức thanh toán</h4>
           <div class="my-3">
             <div class="form-check">
-              <input id="credit" value="Thẻ tín dụng" type="radio" class="form-check-input" v-model="methodInput" checked>
-              <label class="form-check-label" for="credit">Thẻ tín dụng</label>
+              <input id="cash" value="Tiền mặt" type="radio" class="form-check-input" v-model="methodInput" checked>
+              <label class="form-check-label" for="cash">Tiền mặt</label>
             </div>
             <div class="form-check">
-              <input id="debit" value="Thẻ ghi nợ" type="radio" class="form-check-input" v-model="methodInput">
-              <label class="form-check-label" for="debit">Thẻ ghi nợ</label>
-            </div>
-            <div class="form-check">
-              <input id="paypal" value="Ví điện tử" type="radio" class="form-check-input" v-model="methodInput">
-              <label class="form-check-label" for="paypal">Ví điện tử (Momo, ZaloPay, PayPal)</label>
+              <input id="vnpay" value="VNPay" type="radio" class="form-check-input" v-model="methodInput">
+              <label class="form-check-label" for="vnpay">VNPay</label>
             </div>
           </div>
 
           <hr class="my-4">
-          <button class="w-100 btn btn-outline-dark flex-shrink-0 btn-lg" type="button" @click="checkout">Thanh toán ngay</button>
+          <button class="w-100 btn btn-outline-dark flex-shrink-0 btn-lg" type="button" @click="checkout">Thanh toán
+            ngay</button>
         </form>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
 import { publicRequest, userRequest } from '../requestMethod';
 
 export default {
-  data () {
+  data() {
     return {
       items: [],
       user: {},
@@ -108,12 +100,7 @@ export default {
     }
   },
   beforeCreate() {
-    if (!this.$store.getters.getToken) {
-      this.$router.push('/login');
-    } else if (this.$store.getters.getCart.length === 0) {
-      this.$router.push('/san-pham');
-      this.$store.dispatch('addNotification', 'Giỏ hàng của bạn đang trống!');
-    }
+
   },
   mounted() {
     this.items = this.$store.getters.getCart;
@@ -133,14 +120,14 @@ export default {
         paymentMethod: this.methodInput,
         total: this.total,
       })
-      .then(res => {
-        this.$store.dispatch('addNotification', 'Đơn hàng của bạn đã được đặt thành công!');
-        this.$store.dispatch('resetCart');
-        this.$router.push('/receipt/' + res.data._id);
-      })
-      .catch(err => {
-        this.$store.dispatch('addNotification', 'Đặt hàng thất bại. Vui lòng thử lại!');
-      });
+        .then(res => {
+          this.$store.dispatch('addNotification', 'Đơn hàng của bạn đã được đặt thành công!');
+          this.$store.dispatch('resetCart');
+          this.$router.push('/receipt/' + res.data._id);
+        })
+        .catch(err => {
+          this.$store.dispatch('addNotification', 'Đặt hàng thất bại. Vui lòng thử lại!');
+        });
     },
     calculateTotal() {
       this.subTotal = this.$store.getters.getCartTotal;
@@ -151,5 +138,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

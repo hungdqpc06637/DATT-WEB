@@ -8,9 +8,6 @@
 		<div class="product-info">
 			<label class="product-title"> {{ product.name }} </label>
 			<div class="product-icons">
-				<div class="product-icon" v-add-to-cart="{ $store, item: { ...product, quantity: 1 } }">
-					<i class="bi bi-cart-plus-fill"></i>
-				</div>
 				<router-link :to="'/product/' + product.id" class="text-dark text-decoration-none">
 					<div class="product-icon">
 						<i class="bi bi-eye"></i>
