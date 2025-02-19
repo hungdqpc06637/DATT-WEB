@@ -1,8 +1,8 @@
 <template>
-  <div :id="String(toastId)" class="toast fade show custom-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+  <div :id="String(toastId)" class="toast fade show custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
-      <i class="bi bi-bag-check me-2 text-gold"></i>
-      <strong class="me-auto text-uppercase">Thông Báo</strong>
+      <i class="bi bi-bell me-2 text-warning"></i>
+      <strong class="me-auto">Thông Báo</strong>
       <small class="text-muted">{{ timestamp }}</small>
       <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
@@ -19,11 +19,11 @@ export default {
   props: {
     toastId: {
       type: Number,
-      default: -1
+      required: true
     },
     desc: {
       type: String,
-      default: 'Your fashion item has been added to the cart!'
+      required: true
     }
   },
   data() {
@@ -31,7 +31,7 @@ export default {
       timestamp: this.formatTimestamp()
     };
   },
-  mounted () {
+  mounted() {
     this.$nextTick(() => {
       const toastElement = document.getElementById(String(this.toastId));
       if (toastElement) {
@@ -43,62 +43,33 @@ export default {
   methods: {
     formatTimestamp() {
       const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      return `${hours}:${minutes}:${seconds}`;
+      return now.toLocaleTimeString();
     }
   }
-}
+};
 </script>
 
 <style scoped>
 .custom-toast {
-  max-width: 400px;
-  background-color: #f0f8ff;
+  max-width: 350px;
+  background-color: #fffbe6;
   color: #333;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  border: 1px solid #ffeb3b;
   font-size: 14px;
 }
 
 .toast-header {
-  background-color: #4caf50;
+  background-color: #ff9800;
   color: white;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
 }
 
 .toast-body {
-  padding: 15px;
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-.btn-close {
-  color: white;
-  opacity: 0.7;
-}
-
-.custom-toast .toast-header i {
-  font-size: 18px;
-}
-
-.toast-body {
+  padding: 10px;
   font-size: 14px;
-  font-weight: 500;
-}
-
-.toast-body p {
-  margin: 0;
 }
 
 .toast-container {
   z-index: 9999;
-}
-
-.toast {
-  opacity: 1 !important;
-  transition: opacity 0.3s ease-in-out !important;
 }
 </style>

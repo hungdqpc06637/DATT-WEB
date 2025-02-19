@@ -1,39 +1,52 @@
 const state = {
-  data: [
-    {
-      id: 0,
-      desc: 'Welcome to our website!',
-    },
-  ]
-}
+  notifications: JSON.parse(localStorage.getItem("notifications")) || []
+};
 
 const mutations = {
   ADD_NOTIFICATION(state, notification) {
-    state.data.push({ id: state.data.length, desc: notification })
+    const newNotification = {
+      id: Date.now(),
+      desc: notification.desc
+    };
+    state.notifications.push(newNotification);
+    localStorage.setItem("notifications", JSON.stringify(state.notifications)); // Lưu vào localStorage
+  },
+  REMOVE_NOTIFICATION(state, id) {
+    state.notifications = state.notifications.filter((toast) => toast.id !== id);
+    localStorage.setItem("notifications", JSON.stringify(state.notifications)); // Cập nhật localStorage
   },
   RESET_NOTIFICATIONS(state) {
-    state.data = []
+    state.notifications = [];
+    localStorage.removeItem("notifications"); // Xóa khỏi localStorage
   }
-}
+};
 
 const actions = {
-  addNotification({ commit }, payload) {
-    commit('ADD_NOTIFICATION', payload)
+  addNotification({ commit }, notification) {
+    const newNotification = {
+      id: Date.now(),
+      desc: notification.desc
+    };
+
+    commit('ADD_NOTIFICATION', newNotification);
+
+    setTimeout(() => {
+      commit('REMOVE_NOTIFICATION', newNotification.id);
+    }, 3000);
   },
   resetNotifications({ commit }) {
-    commit('RESET_NOTIFICATIONS')
+    commit('RESET_NOTIFICATIONS');
   }
-}
+};
 
 const getters = {
-  getNotifications: (state) => {
-    return state.data
-  }
-}
+  getNotifications: (state) => state.notifications
+};
 
 export default {
+  namespaced: true,
   state,
   mutations,
   actions,
   getters
-}
+};

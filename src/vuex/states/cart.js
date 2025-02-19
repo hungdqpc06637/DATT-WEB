@@ -1,4 +1,3 @@
-// store/modules/cart.js
 import { publicRequest } from '../../requestMethod.js';
 
 const state = {
@@ -7,19 +6,19 @@ const state = {
 
 const mutations = {
   setCartItems(state, items) {
-    state.cartItems = [...items]; // Cập nhật lại toàn bộ giỏ hàng
+    state.cartItems = [...items];
   },
   updateCartItem(state, { productId, quantity }) {
     const item = state.cartItems.find((item) => item.id === productId);
     if (item) {
-      item.quantity = quantity; // Cập nhật số lượng sản phẩm
+      item.quantity = quantity;
     }
   },
 };
 
 const getters = {
   cartItemCount: (state) => {
-    return state.cartItems.reduce((total, item) => total + item.quantity, 0); // Trả về tổng số lượng sản phẩm trong giỏ
+    return state.cartItems.reduce((total, item) => total + item.quantity, 0);
   },
 };
 
@@ -29,8 +28,7 @@ const actions = {
       const response = await publicRequest.get(`/cart/get?user_id=${userId}`);
 
       if (response.data.code === 200) {
-        commit('setCartItems', response.data.data || []); // Cập nhật giỏ hàng vào Vuex
-        console.log("Giỏ hàng đã được tải lại:", response.data.data);
+        commit('setCartItems', response.data.data || []);
       } else {
         console.error("Có lỗi khi tải giỏ hàng:", response.data.message);
       }
@@ -48,13 +46,13 @@ const actions = {
       });
 
       if (response.data && response.data.message === "Product added to cart successfully") {
-        console.log('Sản phẩm đã được thêm vào giỏ hàng thành công!');
-        await dispatch('fetchCartData', userId); // Tải lại giỏ hàng sau khi thêm sản phẩm
+        dispatch('notifications/addNotification', { desc: '🛒 Sản phẩm đã được thêm vào giỏ hàng!' }, { root: true });
+        await dispatch('fetchCartData', userId);
       } else {
-        console.error("Lỗi từ API:", response.data);
+        dispatch('notifications/addNotification', { desc: '❌ Không thể thêm vào giỏ hàng!' }, { root: true });
       }
     } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      dispatch('notifications/addNotification', { desc: '⚠️ Lỗi kết nối máy chủ!' }, { root: true });
     }
   }
 };

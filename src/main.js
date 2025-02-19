@@ -11,7 +11,7 @@ import useCustomeDirective from './directives'
 import store from './vuex'
 import router from './router/index.js'
 import Antd from "ant-design-vue";
-
+store.dispatch('notifications/resetNotifications');
 const app = createApp(App)
 app.use(store)
 app.use(Antd)
