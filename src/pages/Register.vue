@@ -2,160 +2,138 @@
   <div class="container min-vh-100">
     <div class="row my-5">
       <div class="col-md-6 offset-md-3 mb-3">
-        <div v-if="errors.length" class="alert alert-danger" role="alert">
+        <!-- 🔴 Hiển thị lỗi -->
+        <div v-if="errors.length" class="alert alert-danger">
           <ul>
-            <li v-for="e in errors">{{ e }}</li>
+            <li v-for="(e, index) in errors" :key="index">{{ e }}</li>
           </ul>
         </div>
+
         <div class="card">
-          <h5 class="card-header">ĐĂNG KÝ TÀI KHOẢN</h5>
+          <div class="card-header bg-primary text-white text-center">
+            <h4>ĐĂNG KÝ TÀI KHOẢN</h4>
+          </div>
           <div class="card-body">
-            <form>
-              <fieldset>
-                <legend>Thông tin tài khoản</legend>
-                <div class="mb-2">
-                  <label for="usernameInput">Tên đăng nhập:</label>
-                  <input type="text" class="form-control" name="usernameInput" id="usernameInput"
-                    v-model="usernameInput">
+            <form @submit.prevent="register">
+              <!-- 🔹 Email -->
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" v-model.trim="email" required />
+              </div>
+
+              <!-- 🔹 Mật khẩu -->
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Mật khẩu</label>
+                  <input type="password" class="form-control" v-model.trim="password" required />
                 </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-2">
-                      <label for="passwordInput">Mật khẩu:</label>
-                      <input type="password" class="form-control" name="passwordInput" id="passwordInput"
-                        v-model="passwordInput">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-2">
-                      <label for="confirmPasswordInput">Xác nhận mật khẩu:</label>
-                      <input type="password" class="form-control" name="confirmPasswordInput" id="confirmPasswordInput"
-                        v-model="confirmPasswordInput">
-                    </div>
-                  </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Xác nhận mật khẩu</label>
+                  <input type="password" class="form-control" v-model.trim="confirmPassword" required />
                 </div>
-              </fieldset>
-              <fieldset>
-                <legend>Thông tin giao hàng</legend>
-                <div class="mb-2">
-                  <label for="nameInput">Họ và tên:</label>
-                  <input type="text" class="form-control" name="nameInput" id="nameInput" v-model="nameInput">
-                </div>
-                <div class="mb-2">
-                  <label for="emailInput">Địa chỉ Email:</label>
-                  <input type="email" class="form-control" name="emailInput" id="emailInput" v-model="emailInput">
-                </div>
-                <div class="mb-2">
-                  <label for="streetAddressInput">Địa chỉ:</label>
-                  <input type="text" class="form-control" name="streetAddressInput" id="streetAddressInput"
-                    v-model="streetAddressInput">
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-2">
-                      <label for="suburbInput">Quận/Huyện:</label>
-                      <input type="text" class="form-control" name="suburbInput" id="suburbInput" v-model="suburbInput">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-2">
-                      <label for="postcodeInput">Mã bưu điện:</label>
-                      <input type="text" class="form-control" name="postcodeInput" id="postcodeInput"
-                        v-model="postcodeInput">
-                    </div>
-                  </div>
-                </div>
-                <div class="mb-2">
-                  <label for="mobileNumberInput">Số điện thoại:</label>
-                  <input type="tel" class="form-control" name="mobileNumberInput" id="mobileNumberInput"
-                    v-model="mobileNumberInput">
-                </div>
-              </fieldset>
-              <button type="button" class="btn btn-outline-dark float-end" @click="checkForm">Đăng ký</button>
+              </div>
+
+              <!-- 🔹 Họ và tên -->
+              <div class="mb-3">
+                <label class="form-label">Họ và tên</label>
+                <input type="text" class="form-control" v-model.trim="fullName" required />
+              </div>
+
+              <!-- 🔹 Số điện thoại -->
+              <div class="mb-3">
+                <label class="form-label">Số điện thoại</label>
+                <input type="tel" class="form-control" v-model.trim="phone" required />
+              </div>
+
+              <!-- 🔹 Nút đăng ký -->
+              <button type="submit" class="btn btn-primary w-100" :disabled="isLoading">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm"></span>
+                Đăng ký
+              </button>
             </form>
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { publicRequest } from '../requestMethod';
+<script setup>
+import { ref, watchEffect } from "vue";
+import { publicRequest } from "../requestMethod";
 
-export default {
-  data() {
-    return {
-      errors: [],
-      nameInput: '',
-      usernameInput: '',
-      passwordInput: '',
-      confirmPasswordInput: '',
-      emailInput: '',
-      streetAddressInput: '',
-      suburbInput: '',
-      postcodeInput: '',
-      mobileNumberInput: '',
-      showTerms: false
+// 🔹 Khai báo biến
+const fullName = ref("");
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const phone = ref("");
+const errors = ref([]);
+const isLoading = ref(false);
+
+// ✅ Hàm đăng ký
+const register = async () => {
+  errors.value = [];
+
+  // ✅ Kiểm tra dữ liệu nhập
+  if (!fullName.value || !email.value || !password.value || !phone.value) {
+    errors.value.push("Vui lòng nhập đầy đủ thông tin.");
+    return;
+  }
+
+  if (password.value.length < 8) errors.value.push("Mật khẩu ít nhất 8 ký tự.");
+  if (password.value !== confirmPassword.value) errors.value.push("Mật khẩu xác nhận không khớp.");
+  if (!/\S+@\S+\.\S+/.test(email.value)) errors.value.push("Email không hợp lệ.");
+  if (!/^\d{10}$/.test(phone.value)) errors.value.push("Số điện thoại phải có 10 chữ số.");
+
+  if (errors.value.length > 0) {
+    console.warn("⚠️ Lỗi nhập liệu:", errors.value);
+    return;
+  }
+
+  isLoading.value = true;
+
+  const requestData = {
+    name: fullName.value,
+    email: email.value,
+    password: password.value,
+    phone: phone.value,
+  };
+
+  console.log("📤 Gửi API với body:", JSON.stringify(requestData));
+
+  try {
+    const response = await publicRequest.post("/user/register", requestData);
+
+    console.log("📌 API Response:", response);
+
+    if (response.data.code === 200) {
+      alert("Đăng ký thành công! Chuyển hướng đến đăng nhập...");
+      setTimeout(() => (window.location.href = "/login"), 1500);
+    } else {
+      console.warn("⚠️ API trả về lỗi:", response.data);
+      errors.value.push(response.data.message || "Đăng ký thất bại.");
     }
-  },
-  methods: {
-    checkForm(e) {
-      var result = true;
-      this.errors = [];
+  } catch (err) {
+    console.error("❌ Lỗi khi gọi API:", err);
 
-      if (!this.usernameInput.trim() || this.usernameInput.trim().length < 3) {
-        result = false;
-        this.errors.push("Vui lòng nhập tên đăng nhập ít nhất 3 ký tự.");
+    if (err.response) {
+      console.warn("⚠️ API Response Error:", err.response);
+
+      // ✅ Xử lý lỗi email trùng
+      if (err.response.data.message.includes("Duplicate entry")) {
+        errors.value.push("Email đã tồn tại, vui lòng dùng email khác.");
+      } else {
+        const errorMsg = err.response.data.message || "Lỗi từ server.";
+        errors.value.push(errorMsg);
       }
-
-      if (!this.passwordInput.trim() || this.passwordInput.trim().length < 8) {
-        result = false;
-        this.errors.push("Vui lòng nhập mật khẩu ít nhất 8 ký tự.");
-      } else if (!/[!$%^&*]/.test(this.passwordInput.trim())) {
-        result = false;
-        this.errors.push("Mật khẩu phải chứa ít nhất một ký tự đặc biệt: $, %, ^, &, hoặc *");
-      }
-
-      if (this.passwordInput !== this.confirmPasswordInput) {
-        result = false;
-        this.errors.push("Mật khẩu xác nhận không khớp.");
-      }
-
-      if (!this.emailInput.trim()) {
-        result = false;
-        this.errors.push("Vui lòng nhập địa chỉ email.");
-      } else if (!/\S+@\S+\.\S+/.test(this.emailInput.trim())) {
-        result = false;
-        this.errors.push("Vui lòng nhập email hợp lệ.");
-      }
-
-      if (!result) {
-        e.preventDefault();
-        window.scrollTo(0, 0);
-        return;
-      }
-
-      var shippingAddress = this.streetAddressInput + ', ' + this.suburbInput + ', ' + this.postcodeInput;
-
-      publicRequest.post('/auth/register', {
-        username: this.usernameInput,
-        password: this.passwordInput,
-        fullname: this.nameInput,
-        email: this.emailInput,
-        phone: this.mobileNumberInput,
-        shippingAddress: shippingAddress
-      }).then(res => {
-        console.log(res);
-        this.$store.dispatch('addNotification', 'Đăng ký thành công!');
-        this.$router.push('/login');
-      }).catch(err => {
-        console.log(err);
-        this.$store.dispatch('addNotification', 'Đăng ký thất bại!');
-      });
+    } else {
+      errors.value.push("Không thể kết nối đến server.");
     }
   }
-}
-</script>
 
-<style scoped></style>
+
+  isLoading.value = false;
+};
+</script>

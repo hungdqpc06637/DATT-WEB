@@ -143,7 +143,7 @@ export default {
     // Hàm tải giỏ hàng từ API và lưu vào Vuex
     const fetchCartData = async () => {
       if (!user.value?.user_id) {
-        console.warn("⚠️ Không có user_id, không thể lấy giỏ hàng.");
+        //console.warn("⚠️ Không có user_id, không thể lấy giỏ hàng.");
         return;
       }
       try {

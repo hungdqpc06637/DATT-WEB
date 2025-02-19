@@ -39,7 +39,7 @@ const filter = ref({
 const currentPage = ref(1); // 🏷️ Trang hiện tại
 
 const getItems = computed(() => {
-	console.log("📦 Dữ liệu products:", props.products); // 🔍 Kiểm tra dữ liệu từ cha
+	
 	if (!props.products || props.products.length === 0) return [];
 
 	if (filter.value.paginated) {
@@ -47,19 +47,12 @@ const getItems = computed(() => {
 		let end = start + filter.value.itemsPerPage;
 		let paginatedProducts = props.products.slice(start, end);
 
-		console.log("🛒 Danh sách sản phẩm sau phân trang:", paginatedProducts);
 		return paginatedProducts;
 	}
 
 	return props.products;
 });
 
-
-// 🔄 Reset trang khi route thay đổi
-watchEffect(() => {
-	console.log("🔄 Route thay đổi, đặt lại trang đầu...");
-	currentPage.value = 1;
-});
 
 // 📌 Cập nhật trang khi bấm phân trang
 const clickCallback = (pageNum) => {

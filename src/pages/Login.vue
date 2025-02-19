@@ -72,27 +72,30 @@ export default {
           email: this.emailInput,
           password: this.passwordInput,
         });
-        const token = response.data.data;
-        if (!token) throw new Error("Không nhận được token từ server.");
 
+        console.log("📥 Response từ server:", response.data); // ✅ In toàn bộ dữ liệu response
+
+        // ✅ Nếu không có token trong response, báo lỗi
+        if (!response.data.data) {
+          throw new Error(response.data.message || "Đăng nhập thất bại.");
+        }
+
+        const token = response.data.data;
         const user = jwtDecode(token);
+
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", token);
+        this.login(user);
 
-        this.login(user); // ✅ Cập nhật user vào trạng thái toàn cục
-
-        // ✅ Kiểm tra nếu role là admin, chuyển hướng tới trang /admin
-        if (user.role === "admin") {
-          this.$router.push("/admin");
-        } else {
-          this.$router.push("/profile");
-        }
+        this.$router.push(user.role === "admin" ? "/admin" : "/profile");
       } catch (error) {
         console.error("Lỗi đăng nhập:", error);
-        this.errors.push(error.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
+        this.errors.push(error.response?.data?.message || "Đăng nhập thất bại.");
         this.isLoading = false;
       }
     }
+
+
 
   }
 };

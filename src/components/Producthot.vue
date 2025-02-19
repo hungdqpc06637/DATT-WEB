@@ -30,12 +30,6 @@ const props = defineProps({
 	},
 	image_url: String
 });
-
-// 🛒 Kiểm tra log dữ liệu sản phẩm
-onMounted(() => {
-	console.log("📦 Dữ liệu sản phẩm nhận được:", props.product, "🖼️ Ảnh sản phẩm:", props.image_url);
-});
-
 // 🖼️ Xử lý hình ảnh sản phẩm
 const imageUrl = computed(() => {
 	return props.image_url ? `/images/${props.image_url}` : "/images/default-image.jpg";

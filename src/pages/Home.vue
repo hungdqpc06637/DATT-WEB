@@ -43,7 +43,8 @@ import Slider from '../components/Slider.vue';
 import Newsletter from '../components/Newsletter.vue';
 import BarChart from '../components/BarChart.vue';
 import ProductsTop12hot from '../components/ProductsTop12hot.vue';
-import axios from 'axios';
+import { publicRequest } from "../requestMethod.js";
+
 
 export default {
 	components: {
@@ -59,7 +60,7 @@ export default {
 	},
 	async mounted() {
 		try {
-			const response = await axios.get("http://localhost:8081/api/v1/product/getlatest");
+			const response = await publicRequest.get("/product/getlatest");
 
 			if (response.data && response.data.code === 200) {
 				this.products = response.data.data || [];
