@@ -14,6 +14,9 @@ const mutations = {
       item.quantity = quantity;
     }
   },
+  resetCart(state) {
+    state.cartItems = []; // ✅ Xóa giỏ hàng ngay lập tức
+  },
 };
 
 const getters = {
@@ -54,6 +57,10 @@ const actions = {
     } catch (error) {
       dispatch('notifications/addNotification', { desc: '⚠️ Lỗi kết nối máy chủ!' }, { root: true });
     }
+  }
+  ,
+  resetCart({ commit }) {
+    commit("resetCart"); // ✅ Xóa giỏ hàng ngay lập tức
   }
 };
 

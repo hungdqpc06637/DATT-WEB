@@ -84,7 +84,7 @@
               <li><router-link class="dropdown-item" to="/profile"><i class="bi bi-person-circle"></i> Trang cá
                   nhân</router-link></li>
               <li>
-                <button class="dropdown-item text-danger" @click="logout">
+                <button class="dropdown-item text-danger" @click="confirmLogout">
                   <i class="bi bi-door-closed-fill"></i> Đăng xuất
                 </button>
               </li>
@@ -112,6 +112,7 @@ import { useAuth } from "../composables/useAuth";
 import { useRouter } from "vue-router";
 import { publicRequest } from "../requestMethod.js";
 import { useStore } from "vuex"; // Import `useStore` từ Vuex
+import { Modal } from "ant-design-vue";
 
 export default {
   setup() {
@@ -125,6 +126,19 @@ export default {
     // Lấy số lượng sản phẩm trong giỏ hàng từ Vuex
     const cartItemCount = computed(() => store.getters['cart/cartItemCount']);
 
+    const confirmLogout = () => {
+      Modal.confirm({
+        title: "Xác nhận đăng xuất",
+        content: "Bạn có chắc chắn muốn đăng xuất không?",
+        okText: "Đăng xuất",
+        okType: "danger",
+        cancelText: "Hủy",
+        zIndex: 2000, // Tăng zIndex cao hơn navbar
+        onOk() {
+          logout();
+        },
+      });
+    };
 
     // Hàm tải giỏ hàng từ API và lưu vào Vuex
     const fetchCartData = async () => {
@@ -175,6 +189,7 @@ export default {
       isNavbarOpen,
       categories,
       cartItemCount,
+      confirmLogout,
     };
   },
 };
