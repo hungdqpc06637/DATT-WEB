@@ -30,14 +30,18 @@ onMounted(() => {
         ...data,
         createdAt: data.created_at,
         total: data.total_price,
-        shippingAddress: data.shipping_address || "Địa chỉ giao hàng chưa được cập nhật",
+        shippingAddress: data.shipping_address
+          ? `${data.shipping_address.full_address}, ${data.shipping_address.city}, ${data.shipping_address.country}`
+          : "Địa chỉ giao hàng chưa được cập nhật",
       };
 
-      // Cập nhật danh sách sản phẩm từ order_details
+
       products.value = data.order_details.map(item => {
         return {
           title: item.product_variant.product.name,
-          img: 'https://via.placeholder.com/150',
+          img: item.product_variant.product_images.length
+            ? `/images/${item.product_variant.product_images[0].image_url}`
+            : '/images/default.jpg', // Nếu không có ảnh thì dùng ảnh mặc định
           price: item.unit_price,
           quantity: item.quantity,
           size: item.product_variant.size,
@@ -98,7 +102,7 @@ const formatCurrency = (value) => {
               <div class="card-body">
                 <div class="row mb-1" v-for="product in products" :key="product.title">
                   <div class="col-md-2">
-                    <img :src="'/images/' + product.img" class="img-fluid" :alt="product.title">
+                    <img :src="product.img" class="img-fluid" :alt="product.title || 'Sản phẩm không có tiêu đề'">
                   </div>
                   <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                     <p class="text-muted mb-0">{{ product.title }}</p>

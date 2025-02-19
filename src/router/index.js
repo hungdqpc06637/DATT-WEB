@@ -19,7 +19,6 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    console.log('Navigating to:', to.path);
     return { top: 0 };
   },
 })

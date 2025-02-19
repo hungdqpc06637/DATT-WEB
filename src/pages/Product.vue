@@ -144,8 +144,6 @@ const fetchProductDetail = async (id) => {
 
 	try {
 		const response = await publicRequest.get(`/product/getvariants/${id}`);
-		console.log(response.data);
-
 		if (response && response.data && response.data.data) {
 			product.value = response.data.data;
 			if (!product.value.images || product.value.images.length === 0) {
@@ -201,7 +199,6 @@ const addToCart = async () => {
 
 onMounted(() => {
 	productId.value = parseInt(route.params.id);
-	console.log('Product ID from URL:', productId.value);
 	if (productId.value) {
 		fetchProductDetail(productId.value);
 	} else {

@@ -136,7 +136,6 @@ export default {
         const response = await publicRequest.get(`/cart/get?user_id=${user.value.user_id}`);
 
         if (response.data.code === 200) {
-          console.log("✅ Dữ liệu giỏ hàng từ API:", response.data.data);
           store.commit("cart/setCartItems", response.data.data || []);
         } else {
           console.error("❌ Lỗi khi lấy giỏ hàng:", response.data.message);
@@ -150,7 +149,6 @@ export default {
     const fetchCategories = async () => {
       try {
         const response = await publicRequest.get("/caterogy/get");
-        console.log("✅ Dữ liệu danh mục:", response.data);
         categories.value = response.data.data; // Lưu danh mục vào biến
       } catch (error) {
         console.error("❌ Lỗi khi lấy danh mục:", error);
@@ -159,7 +157,7 @@ export default {
 
     // Theo dõi thay đổi trong giỏ hàng để debug
     watch(() => store.state.cart.cartItems, (newCart) => {
-      console.log("📢 Cập nhật giỏ hàng trong Vuex:", newCart);
+      //console.log("📢 Cập nhật giỏ hàng trong Vuex:", newCart);
     });
 
     // Gọi API khi component được mount

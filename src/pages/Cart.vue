@@ -122,11 +122,9 @@ export default {
         if (response.data.code === 200) {
           // Kiểm tra nếu dữ liệu giỏ hàng là null hoặc undefined
           if (!response.data.data || response.data.data.length === 0) {
-            this.cart = [];  // Giỏ hàng trống
-            console.log("Giỏ hàng trống");
+            this.cart = [];
           } else {
-            this.cart = response.data.data; // Lưu dữ liệu giỏ hàng
-            console.log("Giỏ hàng được tải lại:", this.cart);
+            this.cart = response.data.data;
           }
 
           // Lưu giỏ hàng vào Vuex
@@ -161,7 +159,6 @@ export default {
         console.log("Phản hồi từ API:", response);  // Kiểm tra phản hồi API
 
         if (response.status === 200) {
-          console.log("Xóa sản phẩm thành công");
 
           // ✅ Cập nhật Vuex bằng cách lọc sản phẩm vừa xóa
           const updatedCart = this.$store.state.cart.cartItems.filter(item => item.id !== productVariantId);
