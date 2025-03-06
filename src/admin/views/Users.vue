@@ -1,11 +1,9 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4 text-white">Quản lý người dùng</h1>
-
-    <!-- Nút thêm người dùng -->
+    <h1 class="text-2xl font-bold mb-4 text-white">QUẢN LÝ NGƯỜI DÙNG</h1>
+ 
     <a-button type="primary" size="large" @click="openAddUserModal">Thêm Người Dùng</a-button>
-
-    <!-- Bảng danh sách người dùng -->
+ 
     <a-table :dataSource="users" :columns="columns" rowKey="id" class="mt-4 custom-table"
       :pagination="{ position: ['bottomCenter'] }" bordered>
       <template #bodyCell="{ column, record }">
@@ -24,14 +22,12 @@
 <script setup>
 import { ref } from "vue";
 import { message } from "ant-design-vue";
-
-// Danh sách người dùng
+ 
 const users = ref([
   { id: 1, name: "Nguyễn Văn A", email: "a@gmail.com", role: "Admin" },
   { id: 2, name: "Trần Thị B", email: "b@gmail.com", role: "User" }
 ]);
-
-// Cấu trúc cột của bảng
+ 
 const columns = [
   { title: "ID", dataIndex: "id", key: "id", align: "center" },
   { title: "Tên", dataIndex: "name", key: "name", align: "center" },
@@ -39,13 +35,11 @@ const columns = [
   { title: "Vai trò", dataIndex: "role", key: "role", align: "center" },
   { title: "Hành động", dataIndex: "actions", key: "actions", align: "center" }
 ];
-
-// Mở modal thêm người dùng
+ 
 const openAddUserModal = () => {
   message.info("Mở modal thêm người dùng");
 };
-
-// Chỉnh sửa thông tin người dùng
+ 
 const editUser = (user) => {
   message.success(`Sửa thông tin của ${user.name}`);
 };
