@@ -1,11 +1,10 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Quản lý đơn hàng</h1>
+    <h1 class="text-2xl font-bold mb-4 text-white">Quản lý đơn hàng</h1>
 
     <!-- Bảng danh sách đơn hàng -->
     <a-table :dataSource="orders" :columns="columns" rowKey="id" class="mt-4 custom-table"
       :pagination="{ position: ['bottomCenter'] }" bordered>
-
       <template #bodyCell="{ column, record }">
         <!-- Format tiền tệ -->
         <template v-if="column.dataIndex === 'total'">
@@ -26,7 +25,6 @@
             <a-button class="btn-delete" @click="deleteOrder(record.id)">❌ Hủy</a-button>
           </a-space>
         </template>
-
       </template>
     </a-table>
   </div>
@@ -36,7 +34,6 @@
 import { ref } from "vue";
 import { message } from "ant-design-vue";
 
-// Danh sách đơn hàng (giả lập dữ liệu)
 const orders = ref(
   Array.from({ length: 50 }, (_, i) => ({
     id: i + 1,
@@ -46,7 +43,6 @@ const orders = ref(
   }))
 );
 
-// Cấu trúc bảng
 const columns = [
   { title: "ID", dataIndex: "id", key: "id", align: "center" },
   { title: "Khách hàng", dataIndex: "customer", key: "customer", align: "center" },
@@ -55,43 +51,44 @@ const columns = [
   { title: "Hành động", dataIndex: "actions", key: "actions", align: "center" }
 ];
 
-// Format tiền tệ
 const formatCurrency = (value) => {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(value);
 };
 
-// Xem chi tiết đơn hàng
 const viewOrder = (order) => {
   message.info(`Xem chi tiết đơn hàng ID: ${order.id}`);
 };
 
-// Hủy đơn hàng
 const deleteOrder = (id) => {
   orders.value = orders.value.filter(order => order.id !== id);
   message.error(`Đơn hàng ID ${id} đã bị hủy!`);
 };
 </script>
 
-
-
-
 <style>
 .custom-table .ant-table-thead>tr>th {
+  background-color: #1e293b;
   color: white !important;
   text-transform: uppercase;
   font-weight: bold;
   font-size: 16px;
   padding: 12px;
+  border-bottom: 2px solid #334155;
 }
 
 .custom-table .ant-table-tbody>tr>td {
+  background-color: transparent;
+  color: #000000;
   text-align: center;
   font-size: 14px;
   padding: 10px;
+  border-bottom: 1px solid #334155;
 }
 
+h1 {
+  color: white;
+}
 
-/* Nút Xem */
 .btn-view {
   background: linear-gradient(135deg, #4f46e5, #6366f1);
   color: white;
@@ -106,7 +103,6 @@ const deleteOrder = (id) => {
   box-shadow: 0px 4px 10px rgba(79, 70, 229, 0.4);
 }
 
-/* Nút Hủy */
 .btn-delete {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
@@ -119,5 +115,55 @@ const deleteOrder = (id) => {
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   transform: scale(1.05);
   box-shadow: 0px 4px 10px rgba(239, 68, 68, 0.4);
+}
+
+.custom-table .ant-pagination {
+  background: transparent !important;
+  border: none !important;
+  margin-top: 16px;
+}
+
+.custom-table .ant-pagination-prev .anticon,
+.custom-table .ant-pagination-next .anticon {
+  color: white !important;
+  fill: white !important;
+}
+
+.custom-table .ant-pagination-item {
+  background: transparent !important;
+  border: 1px solid #fff !important;
+  color: white !important;
+}
+
+.custom-table .ant-pagination-item-active {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+  color: white !important;
+}
+
+.custom-table .ant-pagination-prev,
+.custom-table .ant-pagination-next {
+  background: transparent !important;
+  border: 1px solid #fff !important;
+  border-radius: 2px !important;
+  margin: 0 4px !important;
+}
+
+.custom-table .ant-pagination-prev a,
+.custom-table .ant-pagination-next a {
+  color: white !important;
+  display: inline-block;
+  padding: 4px 8px !important;
+}
+
+.custom-table .ant-pagination-prev:hover,
+.custom-table .ant-pagination-next:hover {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+}
+
+.custom-table .ant-pagination-item:hover {
+  border-color: #4f46e5 !important;
+  color: #4f46e5 !important;
 }
 </style>

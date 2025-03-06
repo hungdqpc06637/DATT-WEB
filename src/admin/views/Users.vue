@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Quản lý người dùng</h1>
+    <h1 class="text-2xl font-bold mb-4 text-white">Quản lý người dùng</h1>
 
     <!-- Nút thêm người dùng -->
     <a-button type="primary" size="large" @click="openAddUserModal">Thêm Người Dùng</a-button>
@@ -12,14 +12,14 @@
         <template v-if="column.dataIndex === 'actions'">
           <a-space>
             <a-button class="btn-update" type="primary" size="large" @click="editUser(record)">Sửa</a-button>
-            <a-button class="btn-delete" type="primary" danger size="large" @click="deleteUser(record.id)">Xóa</a-button>
+            <a-button class="btn-delete" type="primary" danger size="large"
+              @click="deleteUser(record.id)">Xóa</a-button>
           </a-space>
         </template>
       </template>
     </a-table>
   </div>
 </template>
-
 
 <script setup>
 import { ref } from "vue";
@@ -40,7 +40,6 @@ const columns = [
   { title: "Hành động", dataIndex: "actions", key: "actions", align: "center" }
 ];
 
-
 // Mở modal thêm người dùng
 const openAddUserModal = () => {
   message.info("Mở modal thêm người dùng");
@@ -58,24 +57,26 @@ const deleteUser = (id) => {
 };
 </script>
 
-<style>
+<style> 
 .custom-table .ant-table-thead>tr>th {
-  background-color: #201f1f !important;
+  background-color: #201f1f !important; 
   color: white !important;
   text-transform: uppercase;
   font-weight: bold;
   font-size: 16px;
   padding: 12px;
+  border-bottom: 2px solid #334155;
 }
-
+ 
 .custom-table .ant-table-tbody>tr>td {
+  background-color: transparent; 
+  color: #000000; 
   text-align: center;
   font-size: 14px;
   padding: 10px;
+  border-bottom: 1px solid #334155;
 }
-
-
-
+ 
 .btn-update {
   background: linear-gradient(135deg, #4f46e5, #6366f1);
   color: white;
@@ -88,9 +89,7 @@ const deleteUser = (id) => {
   background: linear-gradient(135deg, #4338ca, #4f46e5);
   transform: scale(1.05);
   box-shadow: 0px 4px 10px rgba(79, 70, 229, 0.4);
-}
-
-/* Nút Hủy */
+} 
 .btn-delete {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
@@ -103,5 +102,55 @@ const deleteUser = (id) => {
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   transform: scale(1.05);
   box-shadow: 0px 4px 10px rgba(239, 68, 68, 0.4);
+}
+
+.custom-table .ant-pagination {
+  background: transparent !important;
+  border: none !important;
+  margin-top: 16px;
+}
+
+.custom-table .ant-pagination-prev .anticon,
+.custom-table .ant-pagination-next .anticon {
+  color: white !important;
+  fill: white !important;
+}
+
+.custom-table .ant-pagination-item {
+  background: transparent !important;
+  border: 1px solid #fff !important;
+  color: white !important;
+}
+
+.custom-table .ant-pagination-item-active {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+  color: white !important;
+}
+
+.custom-table .ant-pagination-prev,
+.custom-table .ant-pagination-next {
+  background: transparent !important;
+  border: 1px solid #fff !important;
+  border-radius: 2px !important;
+  margin: 0 4px !important;
+}
+
+.custom-table .ant-pagination-prev a,
+.custom-table .ant-pagination-next a {
+  color: white !important;
+  display: inline-block;
+  padding: 4px 8px !important;
+}
+
+.custom-table .ant-pagination-prev:hover,
+.custom-table .ant-pagination-next:hover {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+}
+
+.custom-table .ant-pagination-item:hover {
+  border-color: #4f46e5 !important;
+  color: #4f46e5 !important;
 }
 </style>
