@@ -15,8 +15,14 @@ const route = useRoute();
 const orderId = route.params.id;
 
 onMounted(() => {
+
+  if (!orderId) {
+    console.error("❌ Không tìm thấy orderId từ route params.");
+    return;
+  }
+
   if (!userId) {
-    console.error("Không tìm thấy user_id trong localStorage.");
+    console.error("❌ Không tìm thấy user_id trong localStorage.");
     return;
   }
 
@@ -24,6 +30,11 @@ onMounted(() => {
   publicRequest
     .get(`/order/getorderid/${orderId}`)
     .then((response) => {
+      if (!response.data || !response.data.data) {
+        console.error("❌ API không trả về dữ liệu đơn hàng hợp lệ!", response.data);
+        return;
+      }
+
       const data = response.data.data;
 
       order.value = {
@@ -35,27 +46,25 @@ onMounted(() => {
           : "Địa chỉ giao hàng chưa được cập nhật",
       };
 
-
-      products.value = data.order_details.map(item => {
-        return {
-          title: item.product_variant.product.name,
-          img: item.product_variant.product_images.length
-            ? `/images/${item.product_variant.product_images[0].image_url}`
-            : '/images/default.jpg', // Nếu không có ảnh thì dùng ảnh mặc định
-          price: item.unit_price,
-          quantity: item.quantity,
-          size: item.product_variant.size,
-          color: item.product_variant.color,
-        };
-      });
+      products.value = (data.order_details || []).map(item => ({
+        title: item.product_variant?.product?.name || "Sản phẩm không xác định",
+        img: (item.product_variant?.product_images?.length > 0)
+          ? `/images/${item.product_variant.product_images[0].image_url}`
+          : '', // Ảnh mặc định nếu không có ảnh
+        price: item.unit_price || 0,
+        quantity: item.quantity || 1,
+        size: item.product_variant?.size || "Không xác định",
+        color: item.product_variant?.color || "Không xác định",
+      }));
 
       isLoading.value = false;
     })
     .catch((error) => {
-      console.log(error);
+      console.error("❌ Lỗi khi tải đơn hàng:", error);
       isLoading.value = false;
     });
 });
+
 
 // Hàm tính toán chiều rộng thanh tiến trình dựa trên trạng thái
 const getProgress = (status) => {

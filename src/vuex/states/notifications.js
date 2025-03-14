@@ -1,3 +1,4 @@
+  // <-- notifications.js -->
 const state = {
   notifications: JSON.parse(localStorage.getItem("notifications")) || []
 };
