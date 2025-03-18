@@ -1,7 +1,7 @@
 <template>
   <div class="container my-5 min-vh-100">
     <div class="row g-5">
-      <!-- Hiển thị giỏ hàng -->
+      <!-- Giỏ hàng của bạn -->
       <div class="col-md-5 col-lg-4 order-md-last">
         <h4 class="d-flex justify-content-between align-items-center mb-3">
           <span>Giỏ hàng của bạn</span>
@@ -17,14 +17,31 @@
               <small class="text-muted"> x {{ item.quantity }}</small>
             </div>
             <span class="fw-bold">
-              {{ (item.product_variants[0]?.base_price * item.quantity).toLocaleString() }} VNĐ
+              {{ (item.product_variants[0]?.variants[0].price * item.quantity).toLocaleString() }} VNĐ
             </span>
           </li>
           <li class="list-group-item d-flex justify-content-between">
-            <span><strong>Tổng cộng</strong></span>
+            <span><strong>Tổng tiền hàng</strong></span>
             <strong>{{ total.toLocaleString() }} VNĐ</strong>
           </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span><strong>Phí vận chuyển</strong></span>
+            <strong>{{ shippingFee.toLocaleString() }} VNĐ</strong>
+          </li>
+          <!-- Hiển thị danh sách dịch vụ nếu có -->
+          <li class="list-group-item" v-if="shippingServices.length">
+            <label for="shippingService" class="form-label"><strong>Dịch vụ vận chuyển</strong></label>
+            <select id="shippingService" class="form-select" v-model="selectedService">
+              <option v-for="service in shippingServices" :key="service.service_id" :value="service">
+                {{ formatShippingService(service) }}
+              </option>
+            </select>
+          </li>
         </ul>
+        <!-- Nếu muốn ẩn nút, bạn có thể xóa dòng dưới -->
+        <!-- <button class="btn btn-outline-primary w-100" @click="calculateShippingFee">
+          Tính phí vận chuyển
+        </button> -->
       </div>
 
       <!-- Thông tin giao hàng -->
@@ -47,14 +64,12 @@
                   <input class="form-check-input" type="radio" :id="'address-' + address.id" :value="address.id"
                     v-model="user.shippingAddress" />
                   <label class="form-check-label" :for="'address-' + address.id">
-                    {{ address.full_address }}, {{ address.city }}, {{ address.postal_code }}, {{ address.country }}
+                    {{ address.full_address }}
                     <span v-if="address.is_default" class="badge bg-info text-dark ms-1">Mặc định</span>
                   </label>
-                  <!-- Nút xoá địa chỉ kiểu đen -->
                   <button type="button" class="btn btn-sm btn-dark ms-2" @click.prevent="deleteAddress(address.id)">
                     Xoá
                   </button>
-                  <!-- Nút sửa địa chỉ kiểu đen -->
                   <button type="button" class="btn btn-sm btn-dark ms-2" @click.prevent="openEditModal(address)">
                     Sửa
                   </button>
@@ -88,24 +103,45 @@
       </div>
     </div>
 
-    <!-- Modal của ant vẫn được dùng cho form thêm/sửa địa chỉ nếu cần -->
+    <!-- Modal cho form thêm/sửa địa chỉ -->
     <a-modal v-model:open="modalVisible" centered @ok="handleModalOk" @cancel="handleModalCancel">
       <template #title>
         <div>Thông tin địa chỉ</div>
       </template>
       <a-form layout="vertical">
-        <a-form-item label="Địa chỉ">
-          <a-input v-model:value="addressForm.full_address" />
+        <!-- Chọn Tỉnh / Thành phố -->
+        <a-form-item label="Tỉnh / Thành phố">
+          <a-select v-model:value="addressForm.ghn_province_id" @change="handleProvinceChange($event)">
+            <a-select-option v-for="prov in provinces" :key="prov.ProvinceID" :value="prov.ProvinceID">
+              {{ prov.ProvinceName }}
+            </a-select-option>
+          </a-select>
         </a-form-item>
-        <a-form-item label="Thành phố">
-          <a-input v-model:value="addressForm.city" />
+
+        <!-- Chọn Quận / Huyện -->
+        <a-form-item label="Quận / Huyện">
+          <a-select v-model:value="addressForm.ghn_district_id" @change="handleDistrictChange($event)">
+            <a-select-option v-for="district in districts" :key="district.DistrictID" :value="district.DistrictID">
+              {{ district.DistrictName }}
+            </a-select-option>
+          </a-select>
         </a-form-item>
+
+        <!-- Chọn Phường / Xã -->
+        <a-form-item label="Phường / Xã">
+          <a-select v-model:value="addressForm.ghn_ward_code" @change="handleWardChange($event)">
+            <a-select-option v-for="ward in wards" :key="ward.WardCode" :value="ward.WardCode">
+              {{ ward.WardName }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+
+        <!-- Mã bưu điện -->
         <a-form-item label="Mã bưu điện">
           <a-input v-model:value="addressForm.postal_code" />
         </a-form-item>
-        <a-form-item label="Quốc gia">
-          <a-input v-model:value="addressForm.country" />
-        </a-form-item>
+
+        <!-- Đặt làm mặc định -->
         <a-form-item label="Đặt làm mặc định">
           <a-switch v-model:checked="addressForm.is_default" />
         </a-form-item>
@@ -116,7 +152,8 @@
 
 <script>
 import { publicRequest } from "../requestMethod.js";
-// Loại bỏ import ant-design-vue notifications (Modal, message)
+import ghnRequest from "../ghnRequest.js";
+const GHN_SHOP_ID = import.meta.env.VITE_GHN_SHOP_ID;
 
 export default {
   name: "Checkout",
@@ -127,21 +164,30 @@ export default {
       user: {
         name: "",
         phone: "",
-        addresses: [], // Danh sách địa chỉ load từ API
+        addresses: [],
         shippingAddress: null,
       },
       methodInput: "Thanh toán khi nhận hàng",
-      // Dữ liệu cho modal thêm/sửa địa chỉ
       modalVisible: false,
+      shippingFee: 0,
+      // Danh sách dịch vụ vận chuyển lấy từ GHN
+      shippingServices: [],
+      // Lưu đối tượng dịch vụ được chọn (chứa service_id & service_type_id)
+      selectedService: null,
+      // Dữ liệu form địa chỉ (các trường chứa id từ API GHN)
       addressForm: {
         id: null,
-        full_address: "",
-        city: "",
+        ghn_province_id: null,
+        ghn_district_id: null,
+        ghn_ward_code: null,
         postal_code: "",
-        country: "",
         is_default: false,
       },
-      isEditing: false, // Xác định modal đang ở trạng thái thêm hay sửa
+      isEditing: false,
+      // Danh sách tỉnh/quận/phường
+      provinces: [],
+      districts: [],
+      wards: [],
     };
   },
   computed: {
@@ -154,11 +200,69 @@ export default {
         return acc + price * item.quantity;
       }, 0);
     },
+    grandTotal() {
+      return this.total + this.shippingFee;
+    },
   },
   mounted() {
     this.fetchShippingAddresses();
   },
+  // Watcher để tự động cập nhật phí và dịch vụ khi địa chỉ giao hàng thay đổi
+  watch: {
+    "user.shippingAddress"(newVal, oldVal) {
+      if (newVal) {
+        this.calculateShippingFee();
+      }
+    },
+  },
   methods: {
+    // Hàm lấy danh sách tỉnh từ API GHN
+    async loadProvinces() {
+      try {
+        const response = await ghnRequest.get("/master-data/province");
+        if (response.data && response.data.data) {
+          this.provinces = response.data.data;
+        } else {
+          console.error("Không có data province. Response:", response.data);
+        }
+      } catch (error) {
+        console.error("Lỗi tải tỉnh/thành:", error);
+      }
+    },
+    async handleProvinceChange(selectedProvinceId) {
+      try {
+        const response = await ghnRequest.post("/master-data/district", { province_id: selectedProvinceId });
+        this.districts = response.data.data;
+        this.addressForm.ghn_district_id = null;
+        this.addressForm.ghn_ward_code = null;
+        this.wards = [];
+      } catch (error) {
+        console.error("Lỗi tải quận/huyện:", error);
+      }
+    },
+    async handleDistrictChange(selectedDistrictId) {
+      try {
+        const response = await ghnRequest.post("/master-data/ward", { district_id: selectedDistrictId });
+        this.wards = response.data.data;
+        this.addressForm.ghn_ward_code = null;
+      } catch (error) {
+        console.error("Lỗi tải phường/xã:", error);
+      }
+    },
+    handleWardChange(selectedWardCode) {
+      const selectedWard = this.wards.find((w) => w.WardCode === selectedWardCode);
+      if (selectedWard) {
+        this.addressForm.postal_code = selectedWard.PostCode || "";
+      }
+    },
+    openAddModal() {
+      this.isEditing = false;
+      this.addressForm = { id: null, ghn_province_id: null, ghn_district_id: null, ghn_ward_code: null, postal_code: "", is_default: false };
+      this.modalVisible = true;
+      this.loadProvinces();
+      this.districts = [];
+      this.wards = [];
+    },
     async fetchShippingAddresses() {
       const userData = localStorage.getItem("user");
       if (!userData) return;
@@ -171,6 +275,7 @@ export default {
           if (this.user.addresses.length) {
             this.user.shippingAddress = this.user.addresses[0].id;
           }
+          await this.mapAddressNames();
         } else {
           this.user.addresses = [];
         }
@@ -179,22 +284,57 @@ export default {
         this.$store.dispatch("notifications/addNotification", { desc: "Không lấy được địa chỉ giao hàng từ hệ thống!" });
       }
     },
-    openAddModal() {
-      this.isEditing = false;
-      this.addressForm = {
-        id: null,
-        full_address: "",
-        city: "",
-        postal_code: "",
-        country: "",
-        is_default: false,
-      };
-      this.modalVisible = true;
+    async mapAddressNames() {
+      if (this.provinces.length === 0) {
+        await this.loadProvinces();
+      }
+      for (let address of this.user.addresses) {
+        let provinceName = "", districtName = "", wardName = "";
+        if (address.province) {
+          const prov = this.provinces.find((p) => p.ProvinceID.toString() === address.province);
+          if (prov) {
+            provinceName = prov.ProvinceName;
+            try {
+              const districtRes = await ghnRequest.post("/master-data/district", { province_id: prov.ProvinceID });
+              const districts = districtRes.data.data;
+              if (address.district) {
+                const dist = districts.find((d) => d.DistrictID.toString() === address.district);
+                if (dist) {
+                  districtName = dist.DistrictName;
+                  try {
+                    const wardRes = await ghnRequest.post("/master-data/ward", { district_id: dist.DistrictID });
+                    const wards = wardRes.data.data;
+                    if (address.ward) {
+                      const wardObj = wards.find((w) => w.WardCode.toString() === address.ward);
+                      if (wardObj) {
+                        wardName = wardObj.WardName;
+                      }
+                    }
+                  } catch (errWard) {
+                    console.error("Lỗi tải phường/xã:", errWard);
+                  }
+                }
+              }
+            } catch (errDistrict) {
+              console.error("Lỗi tải quận/huyện:", errDistrict);
+            }
+          }
+        }
+        address.full_address = `${wardName}, ${districtName}, ${provinceName}`;
+      }
     },
     openEditModal(address) {
       this.isEditing = true;
-      this.addressForm = { ...address };
+      this.addressForm = {
+        id: address.id,
+        ghn_province_id: address.province || null,
+        ghn_district_id: address.district || null,
+        ghn_ward_code: address.ward || null,
+        postal_code: address.postal_code || "",
+        is_default: address.is_default || false,
+      };
       this.modalVisible = true;
+      this.loadProvinces();
     },
     async handleModalOk() {
       const userData = localStorage.getItem("user");
@@ -205,26 +345,20 @@ export default {
       const parsedUser = JSON.parse(userData);
       const userId = parsedUser.user_id;
       try {
+        const payload = {
+          id: this.addressForm.id,
+          user_id: userId,
+          province: this.addressForm.ghn_province_id ? this.addressForm.ghn_province_id.toString() : "",
+          district: this.addressForm.ghn_district_id ? this.addressForm.ghn_district_id.toString() : "",
+          ward: this.addressForm.ghn_ward_code ? this.addressForm.ghn_ward_code.toString() : "",
+          postal_code: this.addressForm.postal_code,
+          is_default: this.addressForm.is_default,
+        };
         if (this.isEditing) {
-          await publicRequest.put("/address/update", {
-            id: this.addressForm.id,
-            user_id: userId,
-            full_address: this.addressForm.full_address,
-            city: this.addressForm.city,
-            postal_code: this.addressForm.postal_code,
-            country: this.addressForm.country,
-            is_default: this.addressForm.is_default,
-          });
+          await publicRequest.put("/address/update", payload);
           this.$store.dispatch("notifications/addNotification", { desc: "Cập nhật địa chỉ thành công!" });
         } else {
-          await publicRequest.post("/address/create", {
-            user_id: userId,
-            full_address: this.addressForm.full_address,
-            city: this.addressForm.city,
-            postal_code: this.addressForm.postal_code,
-            country: this.addressForm.country,
-            is_default: this.addressForm.is_default,
-          });
+          await publicRequest.post("/address/create", payload);
           this.$store.dispatch("notifications/addNotification", { desc: "Thêm địa chỉ thành công!" });
         }
         this.modalVisible = false;
@@ -246,15 +380,111 @@ export default {
       const parsedUser = JSON.parse(userData);
       const userId = parsedUser.user_id;
       try {
-        await publicRequest.delete("/address/delete", {
-          data: { id: addressId, user_id: userId },
-        });
+        await publicRequest.delete("/address/delete", { data: { id: addressId, user_id: userId } });
         this.$store.dispatch("notifications/addNotification", { desc: "Xoá địa chỉ thành công!" });
         this.fetchShippingAddresses();
       } catch (error) {
         console.error("Error deleting address:", error);
         this.$store.dispatch("notifications/addNotification", { desc: "Xoá địa chỉ thất bại!" });
       }
+    },
+    async fetchShippingServices() {
+      const selectedAddress = this.user.addresses.find((addr) => addr.id === this.user.shippingAddress);
+      if (!selectedAddress) {
+        console.error("Không tìm thấy địa chỉ giao hàng phù hợp.");
+        return;
+      }
+      if (!selectedAddress.district) {
+        console.error("Địa chỉ này chưa có district (id từ GHN).");
+        return;
+      }
+      const payload = {
+        shop_id: Number(GHN_SHOP_ID) || 0,
+        from_district: 1572, // ID quận của cửa hàng
+        to_district: parseInt(selectedAddress.district, 10) || 0,
+      };
+      try {
+        const response = await ghnRequest.post("/v2/shipping-order/available-services", payload, {
+          headers: { ShopId: GHN_SHOP_ID },
+        });
+        if (response.data && response.data.data) {
+          this.shippingServices = response.data.data;
+          if (!this.selectedService && this.shippingServices.length) {
+            this.selectedService = this.shippingServices[0];
+          }
+        } else {
+          console.error("GHN API không trả về danh sách dịch vụ:", response.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dịch vụ vận chuyển:", error);
+      }
+    },
+    async calculateShippingFee() {
+      const selectedAddress = this.user.addresses.find((addr) => addr.id === this.user.shippingAddress);
+      if (!selectedAddress) {
+        console.error("Không tìm thấy địa chỉ giao hàng phù hợp.");
+        return;
+      }
+      if (!selectedAddress.district || !selectedAddress.ward) {
+        console.error("Địa chỉ này chưa có district hoặc ward (id từ GHN).");
+        return;
+      }
+      await this.fetchShippingServices();
+      if (!this.selectedService && this.shippingServices.length) {
+        this.selectedService = this.shippingServices[0];
+      }
+      if (!this.selectedService) {
+        console.error("Không có dịch vụ vận chuyển nào được trả về từ GHN.");
+        return;
+      }
+      if (!this.selectedService.service_type_id) {
+        console.error("Đối tượng dịch vụ không có service_type_id, gán giá trị mặc định.");
+        this.selectedService.service_type_id = 2;
+      }
+      const payload = {
+        shop_id: Number(GHN_SHOP_ID) || 0,
+        service_id: this.selectedService.service_id,
+        service_type_id: this.selectedService.service_type_id,
+        insurance_value: 350000,
+        coupon: "",
+        from_district_id: 1572,
+        to_district_id: parseInt(selectedAddress.district, 10) || 0,
+        to_ward_code: selectedAddress.ward || "",
+        weight: 5000,
+        length: 30,
+        width: 20,
+        height: 10,
+      };
+      try {
+        const response = await ghnRequest.post("/v2/shipping-order/fee", payload, {
+          headers: { ShopId: GHN_SHOP_ID },
+        });
+        if (response.data && response.data.data) {
+          this.shippingFee = response.data.data.total;
+          console.log("Phí vận chuyển:", this.shippingFee);
+        } else {
+          console.error("GHN API không trả về dữ liệu hợp lệ:", response.data);
+        }
+      } catch (error) {
+        if (error.response) {
+          console.error("Lỗi từ GHN API:", error.response.data);
+        } else {
+          console.error("Lỗi khi gửi request:", error);
+        }
+      }
+    },
+    // Hàm định dạng tên dịch vụ theo mẫu "Giao hàng nhanh (Tiết kiệm)" hoặc "Giao hàng nhanh (Tiêu chuẩn)"
+    formatShippingService(service) {
+      // Giả sử: service_type_id === 1 => "Tiết kiệm", === 2 => "Tiêu chuẩn"
+      let typeName = "";
+      if (service.service_type_id === 1) {
+        typeName = "Tiết kiệm";
+      } else if (service.service_type_id === 2) {
+        typeName = "Tiêu chuẩn";
+      } else {
+        typeName = service.short_name || "";
+      }
+      return `Giao hàng nhanh (${typeName})`;
     },
     async checkout() {
       const userData = localStorage.getItem("user");

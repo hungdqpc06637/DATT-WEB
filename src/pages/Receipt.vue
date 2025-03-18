@@ -126,7 +126,7 @@ const formatCurrency = (value) => {
                     <p class="text-muted mb-0 small">Số lượng: {{ product.quantity }}</p>
                   </div>
                   <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                    <p class="text-muted mb-0 small">{{ formatCurrency(product.quantity * product.price) }}</p>
+                    <p class="text-muted mb-0 small">Giá: {{ formatCurrency(product.quantity * product.price) }}</p>
                   </div>
                 </div>
                 <hr class="mb-4" style="background-color: #e0e0e0; opacity: 1;">
